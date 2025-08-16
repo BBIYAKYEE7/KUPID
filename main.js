@@ -2,7 +2,9 @@ const { app, BrowserWindow, ipcMain, dialog, Notification } = require('electron'
 const path = require('path');
 const notifier = require('node-notifier');
 const configManager = require('./config');
-const { autoUpdater } = require('electron-updater');
+const https = require('https');
+const fs = require('fs');
+const { exec } = require('child_process');
 
 let mainWindow;
 let sessionTimer;
@@ -10,9 +12,7 @@ let sessionTimeout = 60 * 60 * 1000; // 60분 (밀리초)으로 연장
 let warningTime = 10 * 60 * 1000; // 10분 전 경고로 연장
 let globalLoginSuccess = false; // 전역 로그인 성공 상태
 
-// 자동 업데이트 설정
-autoUpdater.autoDownload = false; // 자동 다운로드 비활성화 (사용자 확인 후 다운로드)
-autoUpdater.autoInstallOnAppQuit = true; // 앱 종료 시 자동 설치
+
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -85,80 +85,292 @@ function createWindow() {
   });
 }
 
-// 자동 업데이트 이벤트 핸들러
-function setupAutoUpdater() {
-  // 업데이트 확인 시작
-  autoUpdater.checkForUpdates();
-  
-  // 업데이트 확인 중
-  autoUpdater.on('checking-for-update', () => {
-    console.log('업데이트 확인 중...');
-  });
-  
-  // 업데이트 없음
-  autoUpdater.on('update-not-available', (info) => {
-    console.log('업데이트가 없습니다:', info);
-  });
-  
-  // 업데이트 발견
-  autoUpdater.on('update-available', (info) => {
-    console.log('업데이트 발견:', info);
+// GitHub API를 사용한 자동 업데이트 시스템
+class GitHubUpdater {
+  constructor() {
+    this.owner = 'BBIYAKYEE7';
+    this.repo = 'KUPID';
+    this.currentVersion = app.getVersion();
+    this.updateUrl = `https://api.github.com/repos/${this.owner}/${this.repo}/releases/latest`;
+  }
+
+  // GitHub API 호출
+  async fetchLatestRelease() {
+    return new Promise((resolve, reject) => {
+      const options = {
+        hostname: 'api.github.com',
+        path: `/repos/${this.owner}/${this.repo}/releases/latest`,
+        method: 'GET',
+        headers: {
+          'User-Agent': 'KUPID-App',
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      };
+
+      const req = https.request(options, (res) => {
+        let data = '';
+        
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        
+        res.on('end', () => {
+          try {
+            const release = JSON.parse(data);
+            resolve(release);
+          } catch (error) {
+            reject(error);
+          }
+        });
+      });
+
+      req.on('error', (error) => {
+        reject(error);
+      });
+
+      req.end();
+    });
+  }
+
+  // 버전 비교
+  isNewerVersion(latestVersion) {
+    const current = this.currentVersion.split('.').map(Number);
+    const latest = latestVersion.split('.').map(Number);
     
-    // 사용자에게 업데이트 알림
-    dialog.showMessageBox(mainWindow, {
-      type: 'info',
-      title: '업데이트 발견',
-      message: '새로운 버전이 발견되었습니다.',
-      detail: `현재 버전: ${app.getVersion()}\n새 버전: ${info.version}\n\n업데이트를 다운로드하시겠습니까?`,
-      buttons: ['다운로드', '나중에'],
-      defaultId: 0,
-      cancelId: 1
-    }).then((result) => {
-      if (result.response === 0) {
-        // 사용자가 다운로드 선택
-        autoUpdater.downloadUpdate();
+    for (let i = 0; i < Math.max(current.length, latest.length); i++) {
+      const currentPart = current[i] || 0;
+      const latestPart = latest[i] || 0;
+      
+      if (latestPart > currentPart) return true;
+      if (latestPart < currentPart) return false;
+    }
+    
+    return false;
+  }
+
+  // 플랫폼별 다운로드 URL 찾기
+  getDownloadUrl(release, platform) {
+    const assets = release.assets || [];
+    const platformPatterns = {
+      'darwin': ['mac', 'dmg', 'zip'],
+      'win32': ['win', 'exe', 'msi'],
+      'linux': ['linux', 'AppImage', 'deb']
+    };
+
+    const patterns = platformPatterns[process.platform] || [];
+    
+    for (const asset of assets) {
+      const assetName = asset.name.toLowerCase();
+      if (patterns.some(pattern => assetName.includes(pattern))) {
+        return asset.browser_download_url;
+      }
+    }
+    
+    return null;
+  }
+
+  // 업데이트 확인
+  async checkForUpdates() {
+    try {
+      console.log('GitHub API를 통해 업데이트 확인 중...');
+      const release = await this.fetchLatestRelease();
+      
+      if (!release || !release.tag_name) {
+        console.log('릴리즈 정보를 찾을 수 없습니다.');
+        return null;
+      }
+
+      const latestVersion = release.tag_name.replace('v', '');
+      console.log(`최신 버전: ${latestVersion}, 현재 버전: ${this.currentVersion}`);
+
+      if (this.isNewerVersion(latestVersion)) {
+        console.log('새로운 버전이 발견되었습니다!');
+        return {
+          version: latestVersion,
+          release: release,
+          downloadUrl: this.getDownloadUrl(release, process.platform)
+        };
+      } else {
+        console.log('이미 최신 버전입니다.');
+        return null;
+      }
+    } catch (error) {
+      console.error('업데이트 확인 중 오류:', error);
+      return null;
+    }
+  }
+
+  // 업데이트 다운로드
+  async downloadUpdate(downloadUrl, progressCallback) {
+    return new Promise((resolve, reject) => {
+      const fileName = `KUPID-update-${Date.now()}.zip`;
+      const filePath = path.join(app.getPath('temp'), fileName);
+      
+      const file = fs.createWriteStream(filePath);
+      let downloadedBytes = 0;
+      let totalBytes = 0;
+
+      https.get(downloadUrl, (response) => {
+        totalBytes = parseInt(response.headers['content-length'], 10);
+        
+        response.on('data', (chunk) => {
+          downloadedBytes += chunk.length;
+          const progress = (downloadedBytes / totalBytes) * 100;
+          
+          if (progressCallback) {
+            progressCallback({
+              percent: Math.round(progress),
+              downloadedBytes,
+              totalBytes
+            });
+          }
+        });
+
+        response.pipe(file);
+
+        file.on('finish', () => {
+          file.close();
+          resolve(filePath);
+        });
+
+        file.on('error', (error) => {
+          fs.unlink(filePath, () => {}); // 파일 삭제
+          reject(error);
+        });
+      }).on('error', (error) => {
+        reject(error);
+      });
+    });
+  }
+
+  // 업데이트 설치
+  async installUpdate(filePath) {
+    return new Promise((resolve, reject) => {
+      // macOS의 경우
+      if (process.platform === 'darwin') {
+        exec(`open "${filePath}"`, (error) => {
+          if (error) {
+            reject(error);
+          } else {
+            // 앱 종료
+            setTimeout(() => {
+              app.quit();
+            }, 1000);
+            resolve();
+          }
+        });
+      }
+      // Windows의 경우
+      else if (process.platform === 'win32') {
+        exec(`start "" "${filePath}"`, (error) => {
+          if (error) {
+            reject(error);
+          } else {
+            setTimeout(() => {
+              app.quit();
+            }, 1000);
+            resolve();
+          }
+        });
+      }
+      // Linux의 경우
+      else {
+        exec(`xdg-open "${filePath}"`, (error) => {
+          if (error) {
+            reject(error);
+          } else {
+            setTimeout(() => {
+              app.quit();
+            }, 1000);
+            resolve();
+          }
+        });
       }
     });
-  });
+  }
+}
+
+// 자동 업데이트 이벤트 핸들러
+function setupAutoUpdater() {
+  const updater = new GitHubUpdater();
   
-  // 다운로드 시작
-  autoUpdater.on('download-progress', (progressObj) => {
-    console.log('다운로드 진행률:', progressObj.percent);
-    
-    // 진행률을 렌더러로 전송
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('update-download-progress', progressObj);
+  // 업데이트 확인
+  updater.checkForUpdates().then(updateInfo => {
+    if (updateInfo) {
+      console.log('업데이트 발견:', updateInfo);
+      
+      // 사용자에게 업데이트 알림
+      dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: '업데이트 발견',
+        message: '새로운 버전이 발견되었습니다.',
+        detail: `현재 버전: ${app.getVersion()}\n새 버전: ${updateInfo.version}\n\n업데이트를 다운로드하시겠습니까?`,
+        buttons: ['다운로드', '나중에'],
+        defaultId: 0,
+        cancelId: 1
+      }).then((result) => {
+        if (result.response === 0) {
+          // 사용자가 다운로드 선택
+          downloadAndInstallUpdate(updater, updateInfo);
+        }
+      });
+    } else {
+      console.log('업데이트가 없습니다.');
     }
+  }).catch(error => {
+    console.error('업데이트 확인 중 오류:', error);
   });
-  
-  // 다운로드 완료
-  autoUpdater.on('update-downloaded', (info) => {
-    console.log('업데이트 다운로드 완료:', info);
+}
+
+// 업데이트 다운로드 및 설치
+async function downloadAndInstallUpdate(updater, updateInfo) {
+  try {
+    if (!updateInfo.downloadUrl) {
+      throw new Error('다운로드 URL을 찾을 수 없습니다.');
+    }
+
+    // 다운로드 진행률 표시
+    const progressCallback = (progress) => {
+      console.log('다운로드 진행률:', progress.percent + '%');
+      
+      // 진행률을 렌더러로 전송
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('update-download-progress', progress);
+      }
+    };
+
+    // 업데이트 다운로드
+    const filePath = await updater.downloadUpdate(updateInfo.downloadUrl, progressCallback);
+    
+    console.log('업데이트 다운로드 완료:', filePath);
     
     // 사용자에게 설치 알림
     dialog.showMessageBox(mainWindow, {
       type: 'info',
       title: '업데이트 준비 완료',
       message: '업데이트가 다운로드되었습니다.',
-      detail: '앱을 재시작하면 업데이트가 적용됩니다. 지금 재시작하시겠습니까?',
-      buttons: ['지금 재시작', '나중에'],
+      detail: '업데이트를 설치하시겠습니까?',
+      buttons: ['지금 설치', '나중에'],
       defaultId: 0,
       cancelId: 1
     }).then((result) => {
       if (result.response === 0) {
-        // 사용자가 재시작 선택
-        autoUpdater.quitAndInstall();
+        // 사용자가 설치 선택
+        updater.installUpdate(filePath).then(() => {
+          console.log('업데이트 설치 시작');
+        }).catch(error => {
+          console.error('업데이트 설치 오류:', error);
+          dialog.showErrorBox('업데이트 설치 오류', 
+            `업데이트 설치 중 오류가 발생했습니다:\n${error.message}`);
+        });
       }
     });
-  });
-  
-  // 업데이트 오류
-  autoUpdater.on('error', (err) => {
-    console.error('업데이트 오류:', err);
     
+  } catch (error) {
+    console.error('업데이트 다운로드 오류:', error);
     dialog.showErrorBox('업데이트 오류', 
-      `업데이트 중 오류가 발생했습니다:\n${err.message}`);
-  });
+      `업데이트 중 오류가 발생했습니다:\n${error.message}`);
+  }
 }
 
 function startSessionTimer() {
@@ -778,10 +990,11 @@ ipcMain.handle('reset-session-timer', () => {
   resetSessionTimer();
 });
 
-// 업데이트 관련 IPC 핸들러
+// GitHub API 기반 업데이트 IPC 핸들러
 ipcMain.handle('check-for-updates', async () => {
   try {
-    const result = await autoUpdater.checkForUpdates();
+    const updater = new GitHubUpdater();
+    const result = await updater.checkForUpdates();
     return { success: true, result };
   } catch (error) {
     console.error('업데이트 확인 오류:', error);
@@ -789,19 +1002,27 @@ ipcMain.handle('check-for-updates', async () => {
   }
 });
 
-ipcMain.handle('download-update', async () => {
+ipcMain.handle('download-update', async (event, updateInfo) => {
   try {
-    const result = await autoUpdater.downloadUpdate();
-    return { success: true, result };
+    const updater = new GitHubUpdater();
+    const progressCallback = (progress) => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('update-download-progress', progress);
+      }
+    };
+    
+    const filePath = await updater.downloadUpdate(updateInfo.downloadUrl, progressCallback);
+    return { success: true, filePath };
   } catch (error) {
     console.error('업데이트 다운로드 오류:', error);
     return { success: false, error: error.message };
   }
 });
 
-ipcMain.handle('install-update', () => {
+ipcMain.handle('install-update', async (event, filePath) => {
   try {
-    autoUpdater.quitAndInstall();
+    const updater = new GitHubUpdater();
+    await updater.installUpdate(filePath);
     return { success: true };
   } catch (error) {
     console.error('업데이트 설치 오류:', error);

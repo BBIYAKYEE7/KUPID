@@ -1,6 +1,6 @@
 {
   "name": "korea-university-portal",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "고려대학교 포털 데스크탑 앱",
   "main": "main.js",
   "scripts": {
@@ -23,7 +23,6 @@
     "electron-builder": "^24.6.4"
   },
   "dependencies": {
-    "electron-updater": "^6.6.2",
     "node-notifier": "^10.0.1"
   },
   "build": {
@@ -32,11 +31,7 @@
     "directories": {
       "output": "dist"
     },
-    "publish": {
-      "provider": "github",
-      "owner": "BBIYAKYEE7",
-      "repo": "KUPID"
-    },
+
     "files": [
       "main.js",
       "renderer.js",

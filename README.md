@@ -33,34 +33,31 @@ npm run build:win
 npm run build:linux
 ```
 
-## 자동 업데이트 설정
+## 자동 업데이트 시스템
 
-### 1. GitHub Personal Access Token 생성
-1. GitHub.com → Settings → Developer settings → Personal access tokens → Tokens (classic)
-2. "Generate new token (classic)" 클릭
-3. 필요한 권한 선택:
-   - `repo` (전체 저장소 접근)
-   - `workflow` (GitHub Actions 실행)
-4. 토큰 생성 후 복사
+### GitHub API 기반 자동 업데이트
+KUPID는 GitHub API를 사용하여 자동 업데이트를 제공합니다. Personal Access Token이 필요하지 않으며, 공개 API만으로 작동합니다.
 
-### 2. 환경 변수 설정
-```bash
-# .env 파일 생성 (프로젝트 루트에)
-echo "GH_TOKEN=your_github_personal_access_token_here" > .env
-```
+### 업데이트 작동 방식
+1. **자동 확인**: 앱 시작 시 GitHub Releases API를 통해 최신 버전 확인
+2. **버전 비교**: 현재 버전과 최신 버전을 비교하여 업데이트 필요성 판단
+3. **플랫폼별 다운로드**: macOS, Windows, Linux에 맞는 파일 자동 선택
+4. **사용자 선택**: 업데이트 발견 시 사용자가 다운로드/설치 여부 선택
 
-### 3. GitHub Releases 설정
+### GitHub Releases 설정
 1. GitHub 저장소에서 "Releases" 탭으로 이동
 2. "Create a new release" 클릭
-3. 태그 버전 입력 (예: v1.0.0)
+3. 태그 버전 입력 (예: v1.1.0)
 4. 릴리즈 노트 작성
-5. "Publish release" 클릭
+5. 플랫폼별 파일 업로드:
+   - macOS: `.dmg` 또는 `.zip` 파일
+   - Windows: `.exe` 또는 `.msi` 파일
+   - Linux: `.AppImage` 또는 `.deb` 파일
+6. "Publish release" 클릭
 
-### 4. 자동 업데이트 빌드
-```bash
-# GitHub에 자동 업데이트 파일 업로드
-npm run publish
-```
+### 수동 업데이트 확인
+- 앱 내 상단 툴바의 "🔄 업데이트" 버튼 클릭
+- 또는 앱 시작 시 자동으로 확인 (3초 후)
 
 ## 프로젝트 구조
 
