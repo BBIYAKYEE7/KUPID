@@ -75,7 +75,7 @@ body {
 .footer-inner { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; width: 100%; }
 .footer-brand { color: var(--text); margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.4px; }
 .footer-sub { margin: 0; color: var(--muted); }
-.footer-badge { width: 60px; height: auto; opacity: 0.95; }
+.footer-badge { width: 100px; height: auto; opacity: 0.95; }
 .footer-links { display: flex; align-items: center; gap: 12px; }
 .footer-ctas { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 .btn-footer { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--text); text-decoration: none; box-shadow: 0 0 0 0 transparent; transition: box-shadow .2s, transform .05s, background .2s, color .2s; }

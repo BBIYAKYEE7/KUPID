@@ -138,9 +138,9 @@ function App() {
       <footer className="footer" role="contentinfo">
         <div className="container">
           <div className="footer-inner">
+            <img className="footer-badge" src="/images/kuni120-2.png" alt="고려대학교 아이콘" width="24" height="24" />
             <h3 className="footer-brand">BBIYAKYEE7</h3>
             <p className="footer-sub">2025 © Copyright by BBIYAKYEE7, All rights reserved.</p>
-            <img className="footer-badge" src="/images/kuni120-2.png" alt="고려대 120주년 배지" />
             <p className="footer-sub">Made and serviced with React.js</p>
             <div className="footer-ctas">
               <a className="btn-footer" href="mailto:bbiyakyee7@gmail.com" aria-label="Email">✉️ 이메일</a>
