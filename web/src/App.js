@@ -2,12 +2,21 @@ import './App.css';
 
 const RELEASE_URL = 'https://github.com/BBIYAKYEE7/KUPID/releases/latest';
 
-async function fetchLatestWindowsAssetUrl() {
+async function fetchLatestAssetUrl(platform) {
   try {
     const res = await fetch('https://api.github.com/repos/BBIYAKYEE7/KUPID/releases/latest', { headers: { 'Accept': 'application/vnd.github+json' } });
     if (!res.ok) throw new Error('Failed to fetch releases');
     const data = await res.json();
-    const asset = (data.assets || []).find(a => /setup|\.exe$/i.test(a.name));
+    
+    let asset;
+    if (platform === 'windows') {
+      asset = (data.assets || []).find(a => /setup|\.exe$/i.test(a.name));
+    } else if (platform === 'mac') {
+      asset = (data.assets || []).find(a => /\.dmg$|\.pkg$|mac|darwin/i.test(a.name));
+    } else if (platform === 'linux') {
+      asset = (data.assets || []).find(a => /\.AppImage$|\.deb$|\.rpm$|linux/i.test(a.name));
+    }
+    
     return asset ? asset.browser_download_url : RELEASE_URL;
   } catch (e) {
     return RELEASE_URL;
@@ -47,16 +56,26 @@ function App() {
   }
   async function handleWindowsClick(e) {
     e.preventDefault();
-    const url = await fetchLatestWindowsAssetUrl();
+    const url = await fetchLatestAssetUrl('windows');
     window.location.href = url;
   }
+  
+  async function handleMacClick(e) {
+    e.preventDefault();
+    const url = await fetchLatestAssetUrl('mac');
+    window.location.href = url;
+  }
+  
   async function handlePrimaryClick(e) {
     e.preventDefault();
     if (os === 'windows') {
-      const url = await fetchLatestWindowsAssetUrl();
+      const url = await fetchLatestAssetUrl('windows');
+      window.location.href = url;
+    } else if (os === 'mac') {
+      const url = await fetchLatestAssetUrl('mac');
       window.location.href = url;
     } else {
-      alert('준비중입니다. Windows 버전은 바로 설치 가능합니다.');
+      alert('준비중입니다. Windows와 macOS 버전은 바로 설치 가능합니다.');
     }
   }
 
@@ -82,6 +101,7 @@ function App() {
           <div>
             <h1 id="hero-title">고려대학교 포털 KUPID</h1>
             <p className="subtitle">빠르고 간편한 자동 로그인과 세션 관리</p>
+            <p className="notice">⚠️ 이 프로젝트는 고려대학교의 공식 프로젝트가 아닙니다. 개인 개발자가 만든 비공식 앱입니다.</p>
             <div className="cta">
               <a className="btn btn-primary" href="#" onClick={handlePrimaryClick} aria-describedby="primary-desc">{primaryText}</a>
               <p id="primary-desc" className="vh">접속한 운영체제를 자동으로 감지하여 올바른 설치 파일을 안내합니다.</p>
@@ -110,7 +130,7 @@ function App() {
             </li>
             <li className="glass">
               <h3>크로스 플랫폼</h3>
-              <p>macOS, Windows, Linux에서 동일한 경험을 제공할 예정입니다. 현재는 Windows 버전만 제공됩니다.</p>
+              <p>macOS, Windows, Linux에서 동일한 경험을 제공할 예정입니다. 현재는 Windows와 macOS 버전을 제공합니다.</p>
             </li>
           </ul>
         </section>
@@ -120,16 +140,16 @@ function App() {
             <h2 id="download-title">다운로드</h2>
             <p className="muted">아래에서 운영체제에 맞는 설치 파일을 선택하세요.</p>
             <div className="download">
-              <a className="card glass disabled" href="#" aria-label="macOS 준비중">
+              <a className="card glass" href="#" onClick={handleMacClick} aria-label="macOS용 다운로드">
                 <div className="card-body">
-                  <span className="os">macOS</span>
-                  <span className="hint">준비중</span>
+                  <span className="os">macOS(Apple Silicon)</span>
+                  <span className="hint">.dmg </span>
                 </div>
               </a>
               <a className="card glass" href="#" onClick={handleWindowsClick} aria-label="Windows용 다운로드">
                 <div className="card-body">
-                  <span className="os">Windows</span>
-                  <span className="hint">Setup .exe / Portable</span>
+                  <span className="os">Windows(x64)</span>
+                  <span className="hint">Setup.exe</span>
                 </div>
               </a>
               <a className="card glass disabled" href="#" aria-label="Linux 준비중">

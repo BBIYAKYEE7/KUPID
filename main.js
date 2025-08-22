@@ -53,13 +53,23 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
-      webSecurity: true,
+      webSecurity: false, // 안정성을 위해 비활성화
       preload: path.resolve(__dirname, 'preload.js'),
-      webviewTag: true
+      webviewTag: true,
+      // V8 엔진 안정성을 위한 설정
+      experimentalFeatures: false,
+      enableWebSQL: false,
+      // 추가 안정성 설정
+      allowRunningInsecureContent: true,
+      webgl: false,
+      plugins: false
     },
     icon: path.join(__dirname, 'images', 'korea.png'),
     title: '고려대학교 포털',
-    show: false
+    show: false,
+    // 추가 안정성 설정
+    webSecurity: false,
+    allowRunningInsecureContent: true
   });
 
   // 로그인 설정 확인 후 적절한 페이지 로드
@@ -1458,6 +1468,19 @@ ipcMain.handle('open-login-setup', () => {
     return { success: false, message: error.message };
   }
 });
+
+// V8 엔진 안정성을 위한 옵션 설정
+app.commandLine.appendSwitch('--js-flags', '--max-old-space-size=2048 --no-opt --no-lazy');
+app.commandLine.appendSwitch('--disable-background-timer-throttling');
+app.commandLine.appendSwitch('--disable-renderer-backgrounding');
+app.commandLine.appendSwitch('--disable-features', 'VizDisplayCompositor');
+app.commandLine.appendSwitch('--disable-gpu-sandbox');
+app.commandLine.appendSwitch('--disable-software-rasterizer');
+app.commandLine.appendSwitch('--disable-dev-shm-usage');
+app.commandLine.appendSwitch('--no-sandbox');
+app.commandLine.appendSwitch('--disable-web-security');
+app.commandLine.appendSwitch('--disable-features', 'TranslateUI');
+app.commandLine.appendSwitch('--disable-ipc-flooding-protection');
 
 // 앱 이벤트
 app.whenReady().then(createWindow);

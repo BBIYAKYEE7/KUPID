@@ -77,7 +77,19 @@ body {
 .main { padding: 64px 0 36px; }
 .hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px; align-items: center; }
 .hero h1 { margin: 0 0 8px; font-size: 44px; }
-.subtitle { color: var(--muted); margin: 0 0 20px; font-size: 18px; }
+.subtitle { color: var(--muted); margin: 0 0 12px; font-size: 18px; }
+.notice { 
+  color: #f59e0b; 
+  background: rgba(245, 158, 11, 0.1); 
+  padding: 12px; 
+  border-radius: 8px; 
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  margin: 0 0 20px; 
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .cta { display: flex; gap: 12px; align-items: center; }
 
 .hero-image { display: block; width: 360px; max-width: 100%; height: auto; }
