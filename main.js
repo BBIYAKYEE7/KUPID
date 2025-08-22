@@ -1263,46 +1263,49 @@ ipcMain.handle('clear-login-config', () => {
 
 ipcMain.handle('trigger-auto-login', async () => {
   try {
-          // 현재 웹뷰 URL 확인
-      const currentURL = await mainWindow.webContents.executeJavaScript(`
-        (() => {
-          const webview = document.getElementById('portal-webview');
-          if (webview) {
-            return webview.getURL();
-          }
-          return '';
-        })();
-      `);
-      
-      // Login.kpd 페이지인 경우 전역 상태 리셋
-      if (currentURL.includes('Login.kpd')) {
-        console.log('로그인 폼 감지됨, 전역 상태 리셋');
-        globalLoginSuccess = false;
-      }
-      
-      // 전역 로그인 성공 상태 확인 (Login.kpd 페이지 제외)
-      if (globalLoginSuccess && !currentURL.includes('Login.kpd')) {
-        console.log('전역 로그인 성공 상태 확인됨, 자동 로그인 중단');
-        return { success: true, message: '이미 로그인된 상태' };
-      }
+    // 현재 웹뷰 URL 확인
+    const currentURL = await mainWindow.webContents.executeJavaScript(`
+      (() => {
+        const webview = document.getElementById('portal-webview');
+        if (webview) {
+          return webview.getURL();
+        }
+        return '';
+      })();
+    `);
     
+    // Login.kpd 페이지인 경우 전역 상태 리셋
+    if (currentURL.includes('Login.kpd')) {
+      console.log('로그인 폼 감지됨, 전역 상태 리셋');
+      globalLoginSuccess = false;
+    }
+    
+    // 전역 로그인 성공 상태 확인 (Login.kpd 페이지 제외)
+    if (globalLoginSuccess && !currentURL.includes('Login.kpd')) {
+      console.log('전역 로그인 성공 상태 확인됨, 자동 로그인 중단');
+      return { success: true, message: '이미 로그인된 상태' };
+    }
+  
     const config = configManager.loadConfig();
     console.log('자동 로그인 트리거됨, 설정:', config);
     
-    if (config.username && config.password) {
-      console.log('자동 로그인 시도 중...');
-      
-      // 이미 메인 페이지에 있다면 로그인 성공으로 간주
-      if (currentURL.includes('Main.kpd') || currentURL.includes('front/Main.kpd')) {
-        console.log('이미 메인 페이지에 있음, 로그인 성공으로 간주');
-        globalLoginSuccess = true; // 전역 상태 업데이트
-        return { success: true, message: '이미 로그인된 상태' };
-      }
-      
-
-      
-      // 웹뷰에서 자동 로그인 실행
-      const result = await mainWindow.webContents.executeJavaScript(`
+    // 설정이 없거나 불완전한 경우
+    if (!config || !config.username || !config.password) {
+      console.log('로그인 설정이 없거나 불완전함');
+      return { success: false, message: '로그인 설정이 없습니다' };
+    }
+    
+    console.log('자동 로그인 시도 중...');
+    
+    // 이미 메인 페이지에 있다면 로그인 성공으로 간주
+    if (currentURL.includes('Main.kpd') || currentURL.includes('front/Main.kpd')) {
+      console.log('이미 메인 페이지에 있음, 로그인 성공으로 간주');
+      globalLoginSuccess = true; // 전역 상태 업데이트
+      return { success: true, message: '이미 로그인된 상태' };
+    }
+    
+    // 웹뷰에서 자동 로그인 실행
+    const result = await mainWindow.webContents.executeJavaScript(`
         (async () => {
           try {
             const webview = document.getElementById('portal-webview');
@@ -1467,10 +1470,6 @@ ipcMain.handle('trigger-auto-login', async () => {
       `);
       
       return result;
-    } else {
-      console.log('로그인 정보가 없어서 자동 로그인을 건너뜀');
-      return { success: false, message: '로그인 정보가 없습니다' };
-    }
   } catch (error) {
     console.error('자동 로그인 트리거 오류:', error);
     return { success: false, message: error.message };

@@ -1,8 +1,8 @@
-// ?�션 ?�?�머 관�?
+// 세션 타이머 관리
 class SessionTimer {
     constructor() {
-        this.sessionTimeout = 60 * 60 * 1000; // 60분으�??�장
-        this.warningTime = 10 * 60 * 1000; // 10�???경고�??�장
+        this.sessionTimeout = 60 * 60 * 1000; // 60분으로 연장
+        this.warningTime = 10 * 60 * 1000; // 10분 전 경고로 연장
         this.startTime = Date.now();
         this.timer = null;
         this.countdownTimer = null;
@@ -35,19 +35,19 @@ class SessionTimer {
         const seconds = Math.floor((remaining % 60000) / 1000);
         const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         
-        // ?�?�머 ?�스???�데?�트
+        // 타이머 텍스트 업데이트
         const timerElement = document.getElementById('session-timer');
         if (timerElement) {
-            timerElement.textContent = `?�션: ${timeString}`;
+            timerElement.textContent = `세션: ${timeString}`;
         }
         
-        // ?�로그레??�??�데?�트
+        // 프로그레스바 업데이트
         const progressElement = document.getElementById('session-progress-bar');
         if (progressElement) {
             const progress = (remaining / this.sessionTimeout) * 100;
             progressElement.style.width = `${progress}%`;
             
-            // 경고 ?�태???�른 ?�상 변�?
+            // 경고 상태에 따른 색상 변경
             progressElement.className = 'session-progress-fill';
             timerElement.className = 'session-timer';
             
@@ -56,13 +56,13 @@ class SessionTimer {
                 timerElement.classList.add('warning');
             }
             
-            if (remaining <= 60000) { // 1�??�하
+            if (remaining <= 60000) { // 1분 이하
                 progressElement.classList.add('danger');
                 timerElement.classList.add('danger');
             }
         }
         
-        // 경고 모달 ?�시
+        // 경고 모달 표시
         if (remaining <= this.warningTime && remaining > this.warningTime - 1000) {
             this.showWarningModal();
         }
@@ -76,8 +76,8 @@ class SessionTimer {
             modal.classList.remove('hidden');
             modal.classList.add('visible');
             
-            // 카운?�다???�작
-            let countdown = 600; // 10�?
+            // 카운트다운 시작
+            let countdown = 600; // 10분
             this.countdownTimer = setInterval(() => {
                 const minutes = Math.floor(countdown / 60);
                 const seconds = countdown % 60;
@@ -108,12 +108,12 @@ class SessionTimer {
     showSessionExpired() {
         this.stopTimer();
         
-        // ?�션 만료 ?�림
+        // 세션 만료 알림
         if (window.electronAPI) {
             window.electronAPI.resetSessionTimer();
         }
         
-        // 모달 ?�시
+        // 모달 표시
         const modal = document.getElementById('session-warning-modal');
         const modalContent = modal.querySelector('.modal-content');
         const modalHeader = modal.querySelector('.modal-header h3');
@@ -121,10 +121,10 @@ class SessionTimer {
         const countdownElement = document.getElementById('countdown');
         const extendBtn = document.getElementById('extend-session-btn');
         
-        modalHeader.textContent = '?�션 만료';
-        modalBody.textContent = '?�션??만료?�었?�니?? 고려?�?�교 ?�털�??�시 ?�동?�니??';
-        countdownElement.textContent = '만료??;
-        extendBtn.textContent = '?�털�??�동';
+        modalHeader.textContent = '세션 만료';
+        modalBody.textContent = '세션이 만료되었습니다. 고려대학교 포털로 다시 이동합니다.';
+        countdownElement.textContent = '만료됨';
+        extendBtn.textContent = '포털로 이동';
         
         modal.classList.remove('hidden');
         modal.classList.add('visible');
@@ -134,7 +134,7 @@ class SessionTimer {
         this.startTime = Date.now();
         this.hideWarningModal();
         
-        // ?�?�머 ?�태 초기??
+        // 타이머 상태 초기화
         const timerElement = document.getElementById('session-timer');
         const progressElement = document.getElementById('session-progress-bar');
         
@@ -145,7 +145,7 @@ class SessionTimer {
             progressElement.className = 'session-progress-fill';
         }
         
-        // Electron API�??�해 메인 ?�로?�스 ?�?�머???�설??
+        // Electron API를 통해 메인 프로세스 타이머도 재설정
         if (window.electronAPI) {
             window.electronAPI.resetSessionTimer();
         }
@@ -163,7 +163,7 @@ class SessionTimer {
     }
     
     bindEvents() {
-        // ?�로고침 버튼
+        // 새로고침 버튼
         const refreshBtn = document.getElementById('refresh-btn');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', () => {
@@ -174,7 +174,7 @@ class SessionTimer {
             });
         }
         
-        // ?�으�?버튼
+        // 홈으로 버튼
         const homeBtn = document.getElementById('home-btn');
         if (homeBtn) {
             homeBtn.addEventListener('click', () => {
@@ -185,7 +185,7 @@ class SessionTimer {
             });
         }
         
-        // ?�션 ?�장 버튼
+        // 세션 연장 버튼
         const extendBtn = document.getElementById('extend-session-btn');
         if (extendBtn) {
             extendBtn.addEventListener('click', () => {
@@ -194,7 +194,7 @@ class SessionTimer {
             });
         }
         
-        // 모달 ?�기 버튼
+        // 모달 닫기 버튼
         const closeBtn = document.getElementById('close-modal-btn');
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
@@ -202,26 +202,26 @@ class SessionTimer {
             });
         }
         
-        // ?�뷰 ?�벤??
+        // 웹뷰 이벤트
         const webview = document.getElementById('portal-webview');
         if (webview) {
             webview.addEventListener('did-start-loading', () => {
-                // ?�이지 로딩 ?�작 ???�?�머 ?�설??
+                // 페이지 로딩 시작 시 타이머 재설정
                 this.resetTimer();
             });
             
             webview.addEventListener('did-finish-load', () => {
-                // ?�이지 로딩 ?�료 ???�?�머 ?�설??
+                // 페이지 로딩 완료 시 타이머 재설정
                 this.resetTimer();
             });
             
             webview.addEventListener('did-navigate', () => {
-                // ?�비게이?????�?�머 ?�설??
+                // 네비게이션 시 타이머 재설정
                 this.resetTimer();
             });
         }
         
-        // ?�용???�동 감�?
+        // 사용자 활동 감지
         document.addEventListener('mousedown', () => this.resetTimer());
         document.addEventListener('mousemove', () => this.resetTimer());
         document.addEventListener('keypress', () => this.resetTimer());
@@ -229,7 +229,7 @@ class SessionTimer {
         document.addEventListener('touchstart', () => this.resetTimer());
         document.addEventListener('click', () => this.resetTimer());
         
-        // ?�뷰 ?��? ?�동??감�?
+        // 웹뷰 내부 활동도 감지
         const webviewElement = document.getElementById('portal-webview');
         if (webviewElement) {
             webviewElement.addEventListener('dom-ready', () => {
@@ -243,11 +243,11 @@ class SessionTimer {
     }
 }
 
-// ?�동 로그??관�??�래??
+// 자동 로그인 관리 클래스
 class AutoLoginManager {
     constructor() {
         this.config = null;
-        this.loginSuccess = false; // 로그???�공 ?�태 추적
+        this.loginSuccess = false; // 로그인 성공 상태 추적
         this.init();
     }
     
@@ -256,10 +256,15 @@ class AutoLoginManager {
             this.config = await window.electronAPI.getLoginConfig();
             this.bindEvents();
             
-
+            // 설정이 완전하지 않은 경우 로그인 설정 페이지로 이동
+            if (!this.config || !this.config.username || !this.config.password) {
+                setTimeout(() => {
+                    if (window.electronAPI) {
+                        window.electronAPI.openLoginSetup();
+                    }
                 }, 500);
             } else {
-                // ?�동 로그?�이 ?�성?�되???�으�??�행
+                // 자동 로그인이 설정되어 있으면 실행
                 if (this.config.autoLogin && this.config.username && this.config.password) {
                     this.performAutoLogin();
                 }
@@ -268,53 +273,152 @@ class AutoLoginManager {
     }
     
     bindEvents() {
-        // 로그???�정 버튼
+        // 로그인 설정 버튼
         const loginSettingsBtn = document.getElementById('login-settings-btn');
         if (loginSettingsBtn) {
             loginSettingsBtn.addEventListener('click', () => {
-                console.log('로그???�정 버튼 ?�릭??);
-
+                console.log('로그인 설정 버튼 클릭됨');
+                this.showLoginSettingsModal();
             });
         }
         
-        // ?�데?�트 버튼
+        // 업데이트 버튼
         const updateBtn = document.getElementById('update-btn');
         if (updateBtn) {
             updateBtn.addEventListener('click', () => {
-                console.log('?�데?�트 버튼 ?�릭??);
+                console.log('업데이트 버튼 클릭됨');
                 this.checkForUpdates();
             });
         }
         
-
+        // 로그인 설정 모달 관련 버튼들
+        const saveBtn = document.getElementById('save-login-settings-btn');
+        const clearBtn = document.getElementById('clear-login-settings-btn');
+        const closeBtn = document.getElementById('close-login-settings-btn');
+        
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                this.saveLoginSettings();
+            });
+        }
+        
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                this.clearLoginSettings();
+            });
+        }
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.hideLoginSettingsModal();
+            });
+        }
+    }
+    
+    showLoginSettingsModal() {
+        const modal = document.getElementById('login-settings-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            
+            // 기존 설정값 로드
+            if (this.config) {
+                const usernameInput = document.getElementById('username');
+                const passwordInput = document.getElementById('password');
+                const autoLoginCheckbox = document.getElementById('auto-login');
+                const rememberCredentialsCheckbox = document.getElementById('remember-credentials');
+                
+                if (usernameInput) usernameInput.value = this.config.username || '';
+                if (passwordInput) passwordInput.value = this.config.password || '';
+                if (autoLoginCheckbox) autoLoginCheckbox.checked = this.config.autoLogin || false;
+                if (rememberCredentialsCheckbox) rememberCredentialsCheckbox.checked = this.config.rememberCredentials || false;
+            }
         }
     }
     
     hideLoginSettingsModal() {
-
+        const modal = document.getElementById('login-settings-modal');
+        if (modal) {
+            modal.classList.add('hidden');
         }
     }
     
     async saveLoginSettings() {
-
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const autoLogin = document.getElementById('auto-login').checked;
+        const rememberCredentials = document.getElementById('remember-credentials').checked;
+        
+        if (!username || !password) {
+            alert('아이디와 비밀번호를 모두 입력해주세요.');
+            return;
+        }
+        
+        const config = {
+            username: username,
+            password: password,
+            autoLogin: autoLogin,
+            rememberCredentials: rememberCredentials
+        };
+        
+        try {
+            if (window.electronAPI) {
+                const success = await window.electronAPI.saveLoginConfig(config);
+                if (success) {
+                    this.config = config;
+                    alert('로그인 설정이 저장되었습니다.');
+                    this.hideLoginSettingsModal();
+                    
+                    // 자동 로그인이 활성화되어 있으면 즉시 실행
+                    if (autoLogin) {
+                        this.performAutoLogin();
+                    }
+                } else {
+                    alert('설정 저장에 실패했습니다.');
+                }
+            }
+        } catch (error) {
+            console.error('설정 저장 오류:', error);
+            alert('설정 저장 중 오류가 발생했습니다.');
+        }
+    }
+    
+    async clearLoginSettings() {
+        if (confirm('저장된 로그인 정보를 삭제하시겠습니까?')) {
+            try {
+                if (window.electronAPI) {
+                    const success = await window.electronAPI.clearLoginConfig();
+                    if (success) {
+                        this.config = null;
+                        this.loginSuccess = false;
+                        alert('로그인 정보가 삭제되었습니다.');
+                        this.hideLoginSettingsModal();
+                    } else {
+                        alert('로그인 정보 삭제에 실패했습니다.');
+                    }
+                }
+            } catch (error) {
+                console.error('로그인 정보 삭제 오류:', error);
+                alert('로그인 정보 삭제 중 오류가 발생했습니다.');
+            }
+        }
     }
     
     async performAutoLogin() {
-        // ?��? 로그???�공??경우 중단 (?? Login.kpd ?�이지?�서??리셋)
+        // 이미 로그인 성공한 경우 중단 (단, Login.kpd 페이지에서는 리셋)
         if (this.loginSuccess) {
-            // ?�재 ?�이지가 로그???�이지?��? ?�인
+            // 현재 페이지가 로그인 페이지인지 확인
             const webview = document.getElementById('portal-webview');
             if (webview) {
                 const currentURL = webview.getURL();
                 if (currentURL.includes('Login.kpd')) {
-                    console.log('로그?????�감지, ?�태 리셋 ???�동 로그???�시??);
-                    this.loginSuccess = false; // ?�태 리셋
+                    console.log('로그인 페이지 감지, 상태 리셋 후 자동 로그인 시도');
+                    this.loginSuccess = false; // 상태 리셋
                 } else {
-                    console.log('?��? 로그???�공 ?�태, ?�동 로그??중단');
+                    console.log('이미 로그인 성공 상태, 자동 로그인 중단');
                     return;
                 }
             } else {
-                console.log('?��? 로그???�공 ?�태, ?�동 로그??중단');
+                console.log('이미 로그인 성공 상태, 자동 로그인 중단');
                 return;
             }
         }
@@ -323,13 +427,13 @@ class AutoLoginManager {
             return;
         }
         
-        console.log('?�더?�에???�동 로그???�도:', this.config.username);
+        console.log('렌더러에서 자동 로그인 시도:', this.config.username);
         
-        // ?�시 ?��????�동 로그???�행
+        // 즉시 자동 로그인 실행
         setTimeout(async () => {
-            // ?�시 ??�??�공 ?�태 ?�인
+            // 다시 한번 성공 상태 확인
             if (this.loginSuccess) {
-                console.log('로그???�공 ?�태 ?�인?? ?�동 로그??중단');
+                console.log('로그인 성공 상태 확인됨, 자동 로그인 중단');
                 return;
             }
             
@@ -337,51 +441,51 @@ class AutoLoginManager {
                 const result = await window.electronAPI.triggerAutoLogin();
                 
                 if (result && result.success) {
-                    console.log('?�동 로그???�공:', result.message);
-                    this.loginSuccess = true; // ?�공 ?�태 ?�??
+                    console.log('자동 로그인 성공:', result.message);
+                    this.loginSuccess = true; // 성공 상태 설정
                     return;
                 } else {
-                    console.error('?�동 로그???�패:', result ? result.message : '?????�는 ?�류');
-                    // ?�패 ????번만 ???�도 (?�공?��? ?��? 경우?�만)
+                    console.error('자동 로그인 실패:', result ? result.message : '알 수 없는 오류');
+                    // 실패 시 한번만 재시도 (성공하지 않은 경우에만)
                     if (!this.loginSuccess) {
                         setTimeout(() => {
                             this.performAutoLogin();
-                        }, 2000); // 2�????�시??
+                        }, 2000); // 2초 후 재시도
                     }
                 }
             }
         }, 1000);
     }
     
-    // ?�데?�트 관??메서?�들
+    // 업데이트 관리 메서드들
     async checkForUpdates() {
         if (window.electronAPI) {
             try {
                 const result = await window.electronAPI.checkForUpdates();
                 if (result && result.success && result.result) {
-                    console.log('?�데?�트 발견:', result.result);
+                    console.log('업데이트 발견:', result.result);
                     
-                    // ?�용?�에�??�데?�트 ?�림
+                    // 사용자에게 업데이트 알림
                     const shouldDownload = confirm(
-                        `?�로??버전??발견?�었?�니??\n\n` +
-                        `?�재 버전: ${result.result.version}\n` +
-                        `??버전: ${result.result.version}\n\n` +
-                        `?�데?�트�??�운로드?�시겠습?�까?`
+                        `새로운 버전이 발견되었습니다!\n\n` +
+                        `현재 버전: ${result.result.version}\n` +
+                        `새 버전: ${result.result.version}\n\n` +
+                        `업데이트를 다운로드하시겠습니까?`
                     );
                     
                     if (shouldDownload) {
                         this.downloadUpdate(result.result);
                     }
                 } else if (result && result.success && !result.result) {
-                    console.log('?�데?�트가 ?�습?�다.');
-                    alert('?��? 최신 버전?�니??');
+                    console.log('업데이트가 없습니다.');
+                    alert('이미 최신 버전입니다.');
                 } else {
-                    console.error('?�데?�트 ?�인 ?�패:', result ? result.error : '?????�는 ?�류');
-                    alert('?�데?�트 ?�인???�패?�습?�다.');
+                    console.error('업데이트 확인 실패:', result ? result.error : '알 수 없는 오류');
+                    alert('업데이트 확인에 실패했습니다.');
                 }
             } catch (error) {
-                console.error('?�데?�트 ?�인 �??�류:', error);
-                alert('?�데?�트 ?�인 �??�류가 발생?�습?�다.');
+                console.error('업데이트 확인 중 오류:', error);
+                alert('업데이트 확인 중 오류가 발생했습니다.');
             }
         }
     }
@@ -391,23 +495,23 @@ class AutoLoginManager {
             try {
                 const result = await window.electronAPI.downloadUpdate(updateInfo);
                 if (result && result.success) {
-                    console.log('?�데?�트 ?�운로드 ?�료:', result.filePath);
+                    console.log('업데이트 다운로드 완료:', result.filePath);
                     
                     const shouldInstall = confirm(
-                        '?�데?�트가 ?�운로드?�었?�니??\n\n' +
-                        '지�??�치?�시겠습?�까?'
+                        '업데이트가 다운로드되었습니다.\n\n' +
+                        '지금 설치하시겠습니까?'
                     );
                     
                     if (shouldInstall) {
                         this.installUpdate(result.filePath);
                     }
                 } else {
-                    console.error('?�데?�트 ?�운로드 ?�패:', result ? result.error : '?????�는 ?�류');
-                    alert('?�데?�트 ?�운로드???�패?�습?�다.');
+                    console.error('업데이트 다운로드 실패:', result ? result.error : '알 수 없는 오류');
+                    alert('업데이트 다운로드에 실패했습니다.');
                 }
             } catch (error) {
-                console.error('?�데?�트 ?�운로드 �??�류:', error);
-                alert('?�데?�트 ?�운로드 �??�류가 발생?�습?�다.');
+                console.error('업데이트 다운로드 중 오류:', error);
+                alert('업데이트 다운로드 중 오류가 발생했습니다.');
             }
         }
     }
@@ -417,14 +521,14 @@ class AutoLoginManager {
             try {
                 const result = await window.electronAPI.installUpdate(filePath);
                 if (result && result.success) {
-                    console.log('?�데?�트 ?�치 ?�작');
+                    console.log('업데이트 설치 시작');
                 } else {
-                    console.error('?�데?�트 ?�치 ?�패:', result ? result.error : '?????�는 ?�류');
-                    alert('?�데?�트 ?�치???�패?�습?�다.');
+                    console.error('업데이트 설치 실패:', result ? result.error : '알 수 없는 오류');
+                    alert('업데이트 설치에 실패했습니다.');
                 }
             } catch (error) {
-                console.error('?�데?�트 ?�치 �??�류:', error);
-                alert('?�데?�트 ?�치 �??�류가 발생?�습?�다.');
+                console.error('업데이트 설치 중 오류:', error);
+                alert('업데이트 설치 중 오류가 발생했습니다.');
             }
         }
     }
@@ -444,27 +548,30 @@ class AutoLoginManager {
     }
 }
 
-// ??초기??
+// 페이지 초기화
 document.addEventListener('DOMContentLoaded', () => {
-    // ?�션 ?�?�머 ?�작
+    // 세션 타이머 시작
     const sessionTimer = new SessionTimer();
     
-    // ?�동 로그??매니?� ?�작
+    // 자동 로그인 매니저 시작
     const autoLoginManager = new AutoLoginManager();
     
-    // AutoLoginManager 초기???�료 ??로그???�정 ?�인
+    // AutoLoginManager 초기화 완료 후 로그인 설정 확인
     setTimeout(async () => {
-        // ?�정??로드???�까지 ?��?
+        // 설정이 로드될 때까지 대기
         if (autoLoginManager.config) {
-            console.log('?�정 로드??', autoLoginManager.config);
+            console.log('설정 로드됨:', autoLoginManager.config);
             
-
+            // 자동 로그인이 설정되어 있으면 실행
+            if (autoLoginManager.config.autoLogin && autoLoginManager.config.username && autoLoginManager.config.password) {
+                autoLoginManager.performAutoLogin();
+            }
         }
-    }, 1000); // 1�??��?
+    }, 1000); // 1초 대기
     
-    // Electron API가 ?�용 가?�한 경우
+    // Electron API가 사용 가능한 경우
     if (window.electronAPI) {
-        // ?�션 ?�보 가?�오�?
+        // 세션 정보 가져오기
         window.electronAPI.getSessionInfo().then(info => {
             if (info) {
                 sessionTimer.sessionTimeout = info.timeout;
@@ -472,40 +579,40 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // ?�용???�동 ???�?�머 ?�설??
+        // 사용자 활동 시 타이머 재설정
         window.electronAPI.onUserActivity(() => {
             sessionTimer.resetTimer();
         });
     }
     
-            // ?�뷰 ?�정
-        const webview = document.getElementById('portal-webview');
-        if (webview) {
-          // ?�뷰 ?�정
-          webview.setAttribute('webpreferences', 'contextIsolation=yes, nodeIntegration=no');
-          
-                    // 로딩 ?�디케?�터
-          webview.addEventListener('did-start-loading', () => {
-            console.log('?�뷰 로딩 ?�작');
-            // 로딩 ?�작 ??처리
-          });
+    // 웹뷰 설정
+    const webview = document.getElementById('portal-webview');
+    if (webview) {
+        // 웹뷰 설정
+        webview.setAttribute('webpreferences', 'contextIsolation=yes, nodeIntegration=no');
+        
+        // 로딩 인디케이터
+        webview.addEventListener('did-start-loading', () => {
+            console.log('웹뷰 로딩 시작');
+            // 로딩 시작 시 처리
+        });
         
         webview.addEventListener('did-finish-load', () => {
-            // 로딩 ?�료 ???�동 로그???�도 (로그???�공?��? ?��? 경우?�만)
+            // 로딩 완료 시 자동 로그인 시도 (로그인 성공하지 않은 경우에만)
             if (autoLoginManager.config && autoLoginManager.config.autoLogin && !autoLoginManager.loginSuccess) {
                 autoLoginManager.performAutoLogin();
             }
         });
         
         webview.addEventListener('did-fail-load', (event) => {
-            console.error('?�뷰 로딩 ?�패:', event);
+            console.error('웹뷰 로딩 실패:', event);
         });
     }
 });
 
-// ??종료 ???�리
+// 페이지 종료 시 정리
 window.addEventListener('beforeunload', () => {
-    // ?�?�머 ?�리
+    // 타이머 정리
     if (window.sessionTimer) {
         window.sessionTimer.stopTimer();
     }
