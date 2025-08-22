@@ -38,9 +38,11 @@ function App() {
   const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   
-  if (storedTheme) {
-    document.documentElement.setAttribute('data-theme', storedTheme);
-  }
+  React.useEffect(() => {
+    if (storedTheme) {
+      document.documentElement.setAttribute('data-theme', storedTheme);
+    }
+  }, [storedTheme]);
   function toggleTheme() {
     const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
     if (current === 'light') {
@@ -119,6 +121,14 @@ function App() {
             <a href="https://github.com/BBIYAKYEE7/KUPID" target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)}>GitHub</a>
             <a className="btn" href="#" onClick={(e)=>{e.preventDefault();toggleTheme();setIsMenuOpen(false);}} aria-label="테마 전환">테마 전환</a>
           </nav>
+          
+          {/* 모바일 메뉴 오버레이 (메뉴 외부 클릭 시 닫기) */}
+          {isMenuOpen && (
+            <div 
+              className="mobile-menu-overlay" 
+              onClick={() => setIsMenuOpen(false)}
+            />
+          )}
         </div>
       </header>
 

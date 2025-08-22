@@ -110,6 +110,7 @@ body {
   flex-direction: column;
   gap: 15px;
   z-index: 15;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .mobile-nav a {
@@ -149,6 +150,35 @@ body {
   
   .mobile-menu-toggle[aria-expanded="true"] .hamburger-line:nth-child(3) {
     transform: rotate(-45deg) translate(7px, -6px);
+  }
+  
+  /* 모바일 메뉴가 열렸을 때 배경 스크롤 방지 */
+  .mobile-nav--open {
+    display: flex !important;
+  }
+  
+  /* 헤더 높이 조정 */
+  .header {
+    min-height: 60px;
+  }
+  
+  /* 모바일 메뉴 스타일 강화 */
+  .mobile-nav {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+  }
+  
+  .mobile-nav a {
+    color: var(--text) !important;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+  }
+  
+  .mobile-nav a:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text) !important;
   }
 }
 
