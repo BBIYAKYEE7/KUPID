@@ -123,11 +123,19 @@ function App() {
           
           {/* 모바일 메뉴 */}
           <nav className={`nav mobile-nav ${isMenuOpen ? 'mobile-nav--open' : ''}`} aria-label="주요">
-            <a href="#features" onClick={() => setIsMenuOpen(false)}>기능</a>
-            <a href="#download" onClick={() => setIsMenuOpen(false)}>다운로드</a>
-            <a href="#faq" onClick={() => setIsMenuOpen(false)}>FAQ</a>
-            <a href="https://github.com/BBIYAKYEE7/KUPID" target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)}>GitHub</a>
-            <a className="btn" href="#" onClick={(e)=>{e.preventDefault();toggleTheme();setIsMenuOpen(false);}} aria-label="테마 전환">테마 전환</a>
+            <a href="#features" onClick={() => {
+              setTimeout(() => setIsMenuOpen(false), 100);
+            }}>기능</a>
+            <a href="#download" onClick={() => {
+              setTimeout(() => setIsMenuOpen(false), 100);
+            }}>다운로드</a>
+            <a href="#faq" onClick={() => {
+              setTimeout(() => setIsMenuOpen(false), 100);
+            }}>FAQ</a>
+            <a href="https://github.com/BBIYAKYEE7/KUPID" target="_blank" rel="noopener noreferrer" onClick={() => {
+              setTimeout(() => setIsMenuOpen(false), 100);
+            }}>GitHub</a>
+            <a className="btn" href="#" onClick={(e)=>{e.preventDefault();toggleTheme();setTimeout(() => setIsMenuOpen(false), 100);}} aria-label="테마 전환">테마 전환</a>
           </nav>
           
           {/* 모바일 메뉴 오버레이 (메뉴 외부 클릭 시 닫기) */}
