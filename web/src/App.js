@@ -95,7 +95,15 @@ function App() {
           {/* 햄버거 메뉴 버튼 (모바일) */}
           <button 
             className="mobile-menu-toggle" 
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={() => {
+              setIsMenuOpen(!isMenuOpen);
+              // 메뉴가 닫힐 때 애니메이션을 위해 약간의 지연
+              if (isMenuOpen) {
+                setTimeout(() => {
+                  // 애니메이션 완료 후 상태 정리
+                }, 300);
+              }
+            }}
             aria-label="메뉴 열기"
             aria-expanded={isMenuOpen}
           >

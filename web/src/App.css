@@ -111,14 +111,26 @@ body {
   gap: 15px;
   z-index: 15;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: all 0.3s ease;
 }
 
-.mobile-nav a {
-  margin-left: 0 !important;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 16px;
-}
+  .mobile-nav a {
+    margin-left: 0 !important;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 16px;
+    transform: translateX(-20px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    transition-delay: 0.1s;
+  }
+  
+  .mobile-nav a:nth-child(2) { transition-delay: 0.15s; }
+  .mobile-nav a:nth-child(3) { transition-delay: 0.2s; }
+  .mobile-nav a:nth-child(4) { transition-delay: 0.25s; }
+  .mobile-nav a:nth-child(5) { transition-delay: 0.3s; }
 
 .mobile-nav a:last-child {
   border-bottom: none;
@@ -127,6 +139,8 @@ body {
 /* 모바일 메뉴 열림 상태 */
 .mobile-nav--open {
   display: flex;
+  transform: translateY(0);
+  opacity: 1;
 }
 
 /* 모바일에서 데스크탑 네비게이션 숨김 */
@@ -157,6 +171,12 @@ body {
     display: flex !important;
   }
   
+  /* 메뉴가 열렸을 때 항목들 애니메이션 */
+  .mobile-nav--open a {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
   /* 헤더 높이 조정 */
   .header {
     min-height: 60px;
@@ -179,6 +199,17 @@ body {
   .mobile-nav a:hover {
     background: rgba(255, 255, 255, 0.05);
     color: var(--text) !important;
+  }
+  
+  /* 모바일 메뉴 오버레이 */
+  .mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
   }
 }
 
