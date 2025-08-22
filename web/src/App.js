@@ -25,6 +25,26 @@ function detectOS() {
 function App() {
   const os = detectOS();
   const primaryText = os === 'mac' ? 'macOS용 다운로드' : os === 'windows' ? 'Windows용 다운로드' : os === 'linux' ? 'Linux용 다운로드' : '최신 버전 보기';
+  const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
+  if (storedTheme) {
+    document.documentElement.setAttribute('data-theme', storedTheme);
+  }
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    if (current === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'dark');
+    }
+    // 아이콘 교체 (라이트 모드에서 120주년 아이콘으로)
+    const badge = document.querySelector('.footer-badge');
+    const themeNow = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    if (badge) {
+      badge.src = themeNow === 'light' ? '/images/kuni120-1-hd.png' : '/images/kuni120-2.png';
+    }
+  }
   async function handleWindowsClick(e) {
     e.preventDefault();
     const url = await fetchLatestWindowsAssetUrl();
@@ -41,8 +61,8 @@ function App() {
   }
 
   return (
-    <div>
-      <header className="header" role="banner">
+    <div className="theme-transition">
+      <header className="header glass" role="banner">
         <div className="container header-inner">
           <a className="brand" href="#top" aria-label="KUPID 홈">
             <img className="brand-logo-wide" src="/images/kulogo(r).png" alt="고려대로고" width="125" height="36"/>
@@ -52,6 +72,7 @@ function App() {
             <a href="#download">다운로드</a>
             <a href="#faq">FAQ</a>
             <a href="https://github.com/BBIYAKYEE7/KUPID" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a className="btn" style={{marginLeft:12}} href="#" onClick={(e)=>{e.preventDefault();toggleTheme();}} aria-label="테마 전환">테마 전환</a>
           </nav>
         </div>
       </header>
@@ -75,19 +96,19 @@ function App() {
         <section id="features" className="section container" aria-labelledby="feature-title">
           <h2 id="feature-title">주요 기능</h2>
           <ul className="features">
-            <li>
+            <li className="glass">
               <h3>자동 로그인</h3>
               <p>포털 계정을 기억하고 보안 기준에 맞춰 로그인 과정을 자동화합니다.</p>
             </li>
-            <li>
+            <li className="glass">
               <h3>세션 관리</h3>
               <p>세션 만료 전 알림과 자동 갱신으로 안정적인 사용성을 제공합니다.</p>
             </li>
-            <li>
+            <li className="glass">
               <h3>자동 업데이트</h3>
               <p>GitHub Releases를 통해 최신 버전을 손쉽게 유지합니다.</p>
             </li>
-            <li>
+            <li className="glass">
               <h3>크로스 플랫폼</h3>
               <p>macOS, Windows, Linux에서 동일한 경험을 제공할 예정입니다. 현재는 Windows 버전만 제공됩니다.</p>
             </li>
@@ -99,19 +120,19 @@ function App() {
             <h2 id="download-title">다운로드</h2>
             <p className="muted">아래에서 운영체제에 맞는 설치 파일을 선택하세요.</p>
             <div className="download">
-              <a className="card disabled" href="#" aria-label="macOS 준비중">
+              <a className="card glass disabled" href="#" aria-label="macOS 준비중">
                 <div className="card-body">
                   <span className="os">macOS</span>
                   <span className="hint">준비중</span>
                 </div>
               </a>
-              <a className="card" href="#" onClick={handleWindowsClick} aria-label="Windows용 다운로드">
+              <a className="card glass" href="#" onClick={handleWindowsClick} aria-label="Windows용 다운로드">
                 <div className="card-body">
                   <span className="os">Windows</span>
                   <span className="hint">Setup .exe / Portable</span>
                 </div>
               </a>
-              <a className="card disabled" href="#" aria-label="Linux 준비중">
+              <a className="card glass disabled" href="#" aria-label="Linux 준비중">
                 <div className="card-body">
                   <span className="os">Linux</span>
                   <span className="hint">준비중</span>
@@ -137,8 +158,8 @@ function App() {
 
       <footer className="footer" role="contentinfo">
         <div className="container">
-          <div className="footer-inner">
-            <img className="footer-badge" src="/images/kuni120-2.png" alt="고려대학교 아이콘" width="24" height="24" />
+          <div className="footer-inner glass">
+            <img className="footer-badge" src="/images/kuni120-2.png" alt="고려대학교 120주년 아이콘" width="24" height="24" />
             <h3 className="footer-brand">BBIYAKYEE7</h3>
             <p className="footer-sub">2025 © Copyright by BBIYAKYEE7, All rights reserved.</p>
             <p className="footer-sub">Made and serviced with React.js</p>
