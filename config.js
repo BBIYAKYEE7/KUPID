@@ -1,9 +1,12 @@
 const fs = require('fs');
 const path = require('path');
+const { app } = require('electron');
 
 class ConfigManager {
     constructor() {
-        this.configPath = path.join(__dirname, 'config.json');
+        // 사용자별 데이터 디렉터리에 설정 저장 (배포 번들에 포함된 기본 config.json 무시)
+        const userDataDir = app ? app.getPath('userData') : __dirname;
+        this.configPath = path.join(userDataDir, 'config.json');
     }
 
     // 설정 저장
@@ -28,6 +31,7 @@ class ConfigManager {
     // 설정 로드
     loadConfig() {
         try {
+            // 사용자 데이터 경로에 설정이 없으면 기본값 반환 (최초 실행)
             if (!fs.existsSync(this.configPath)) {
                 return {
                     username: '',
@@ -36,7 +40,7 @@ class ConfigManager {
                     rememberCredentials: false
                 };
             }
-
+            
             const config = JSON.parse(fs.readFileSync(this.configPath, 'utf8'));
             console.log('설정이 로드되었습니다.');
             return config;
