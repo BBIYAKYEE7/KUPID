@@ -256,6 +256,7 @@ class AutoLoginManager {
             this.config = await window.electronAPI.getLoginConfig();
             this.bindEvents();
             
+<<<<<<< HEAD
             // 설정 로드 후 로그인 설정이 없으면 별도 페이지로 이동
             if (!this.config.username || !this.config.password || !this.config.autoLogin) {
                 console.log('AutoLoginManager: 로그인 설정이 없어 설정 페이지로 이동합니다.');
@@ -263,6 +264,13 @@ class AutoLoginManager {
                     if (window.electronAPI) {
                         window.electronAPI.openLoginSetup();
                     }
+=======
+            // 설정 로드 후 로그인 설정이 없으면 모달 표시
+            if (!this.config.username || !this.config.password || !this.config.autoLogin) {
+                console.log('AutoLoginManager: 로그인 설정이 없어 모달을 표시합니다.');
+                setTimeout(() => {
+                    this.showLoginSettingsModal();
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
                 }, 500);
             } else {
                 // 자동 로그인이 활성화되어 있으면 실행
@@ -279,9 +287,13 @@ class AutoLoginManager {
         if (loginSettingsBtn) {
             loginSettingsBtn.addEventListener('click', () => {
                 console.log('로그인 설정 버튼 클릭됨');
+<<<<<<< HEAD
                 if (window.electronAPI) {
                     window.electronAPI.openLoginSetup();
                 }
+=======
+                this.showLoginSettingsModal();
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
             });
         }
         
@@ -294,6 +306,7 @@ class AutoLoginManager {
             });
         }
         
+<<<<<<< HEAD
         // 모달 관련 버튼들은 제거 (별도 페이지로 처리)
     }
     
@@ -301,17 +314,64 @@ class AutoLoginManager {
         // 모달 대신 별도 페이지로 이동
         if (window.electronAPI) {
             window.electronAPI.openLoginSetup();
+=======
+        // 로그인 설정 모달 관련 버튼들
+        const saveBtn = document.getElementById('save-login-settings-btn');
+        const clearBtn = document.getElementById('clear-login-settings-btn');
+        const closeBtn = document.getElementById('close-login-settings-btn');
+        
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                this.saveLoginSettings();
+            });
+        }
+        
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                this.clearLoginSettings();
+            });
+        }
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.hideLoginSettingsModal();
+            });
+        }
+    }
+    
+    showLoginSettingsModal() {
+        const modal = document.getElementById('login-settings-modal');
+        if (modal) {
+            // 기존 설정값으로 폼 채우기
+            if (this.config) {
+                document.getElementById('username').value = this.config.username || '';
+                document.getElementById('password').value = this.config.password || '';
+                document.getElementById('auto-login').checked = this.config.autoLogin || false;
+                document.getElementById('remember-credentials').checked = this.config.rememberCredentials || false;
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('visible');
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
         }
     }
     
     hideLoginSettingsModal() {
+<<<<<<< HEAD
         // 모달 닫기 대신 메인 페이지로 이동
         if (window.electronAPI) {
             window.electronAPI.startPortal();
+=======
+        const modal = document.getElementById('login-settings-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('visible');
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
         }
     }
     
     async saveLoginSettings() {
+<<<<<<< HEAD
         // 별도 페이지에서 처리되므로 여기서는 제거
         console.log('saveLoginSettings: 별도 페이지에서 처리됨');
     }
@@ -319,6 +379,50 @@ class AutoLoginManager {
     async clearLoginSettings() {
         // 별도 페이지에서 처리되므로 여기서는 제거
         console.log('clearLoginSettings: 별도 페이지에서 처리됨');
+=======
+        const form = document.getElementById('login-settings-form');
+        const formData = new FormData(form);
+        
+        const config = {
+            username: formData.get('username'),
+            password: formData.get('password'),
+            autoLogin: formData.get('autoLogin') === 'on',
+            rememberCredentials: formData.get('rememberCredentials') === 'on'
+        };
+        
+        // 로그인 정보 저장하지 않을 경우 비밀번호 제거
+        if (!config.rememberCredentials) {
+            config.password = '';
+        }
+        
+        if (window.electronAPI) {
+            const success = await window.electronAPI.saveLoginConfig(config);
+            if (success) {
+                this.config = config;
+                this.hideLoginSettingsModal();
+                
+                // 자동 로그인이 활성화되어 있으면 즉시 실행
+                if (config.autoLogin && config.username && config.password) {
+                    this.performAutoLogin();
+                }
+            }
+        }
+    }
+    
+    async clearLoginSettings() {
+        if (window.electronAPI) {
+            const success = await window.electronAPI.clearLoginConfig();
+            if (success) {
+                this.config = {
+                    username: '',
+                    password: '',
+                    autoLogin: false,
+                    rememberCredentials: false
+                };
+                this.hideLoginSettingsModal();
+            }
+        }
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
     }
     
     async performAutoLogin() {
@@ -480,6 +584,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (autoLoginManager.config) {
             console.log('설정 로드됨:', autoLoginManager.config);
             
+<<<<<<< HEAD
             // 로그인 설정이 없으면 별도 페이지로 이동
             if (!autoLoginManager.config.username || !autoLoginManager.config.password || !autoLoginManager.config.autoLogin) {
                 console.log('로그인 설정이 없어 설정 페이지로 이동합니다.');
@@ -492,6 +597,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.electronAPI) {
                 window.electronAPI.openLoginSetup();
             }
+=======
+            // 로그인 설정이 없으면 모달 자동 표시
+            if (!autoLoginManager.config.username || !autoLoginManager.config.password || !autoLoginManager.config.autoLogin) {
+                console.log('로그인 설정이 없어 모달을 자동으로 표시합니다.');
+                autoLoginManager.showLoginSettingsModal();
+            }
+        } else {
+            console.log('설정이 아직 로드되지 않음, 모달을 자동으로 표시합니다.');
+            autoLoginManager.showLoginSettingsModal();
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
         }
     }, 1000); // 1초 대기
     

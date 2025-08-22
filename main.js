@@ -12,6 +12,7 @@ let sessionTimeout = 60 * 60 * 1000; // 60분 (밀리초)으로 연장
 let warningTime = 10 * 60 * 1000; // 10분 전 경고로 연장
 let globalLoginSuccess = false; // 전역 로그인 성공 상태
 
+<<<<<<< HEAD
 // 로그인 설정 확인 및 페이지 로드 함수
 async function checkLoginConfigAndLoadPage() {
   try {
@@ -40,6 +41,8 @@ async function checkLoginConfigAndLoadPage() {
   }
 }
 
+=======
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
 
 
 function createWindow() {
@@ -51,17 +54,30 @@ function createWindow() {
       contextIsolation: true,
       enableRemoteModule: false,
       webSecurity: true,
+<<<<<<< HEAD
       preload: path.resolve(__dirname, 'preload.js'),
       webviewTag: true
     },
     icon: path.join(__dirname, 'images', 'korea.png'),
+=======
+      preload: path.join(__dirname, 'preload.js'),
+      webviewTag: true
+    },
+    icon: path.join(__dirname, 'korea.icns'),
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
     title: '고려대학교 포털',
     show: false
   });
 
+<<<<<<< HEAD
   // 로그인 설정 확인 후 적절한 페이지 로드
   console.log('로그인 설정 확인 중...');
   checkLoginConfigAndLoadPage();
+=======
+  // 항상 index.html로 시작 (로그인 설정은 모달로 처리)
+  console.log('메인 페이지로 시작');
+  mainWindow.loadFile('index.html');
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
 
   // 개발자 도구 (개발 모드에서만)
   if (process.argv.includes('--dev')) {
@@ -427,13 +443,21 @@ function showSessionWarning() {
     new Notification({
       title: '고려대학교 포털',
       body: '세션이 10분 후 만료됩니다. 활동을 계속하시면 세션이 연장됩니다.',
+<<<<<<< HEAD
       icon: path.join(__dirname, 'images', 'korea.png')
+=======
+      icon: path.join(__dirname, 'korea.icns')
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
     }).show();
   } else {
     notifier.notify({
       title: '고려대학교 포털',
       message: '세션이 10분 후 만료됩니다. 활동을 계속하시면 세션이 연장됩니다.',
+<<<<<<< HEAD
       icon: path.join(__dirname, 'images', 'korea.png'),
+=======
+      icon: path.join(__dirname, 'korea.icns'),
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
       sound: true
     });
   }
@@ -454,13 +478,21 @@ function showSessionExpired() {
     new Notification({
       title: '고려대학교 포털',
       body: '세션이 만료되었습니다. 다시 로그인해주세요.',
+<<<<<<< HEAD
       icon: path.join(__dirname, 'images', 'korea.png')
+=======
+      icon: path.join(__dirname, 'korea.icns')
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
     }).show();
   } else {
     notifier.notify({
       title: '고려대학교 포털',
       message: '세션이 만료되었습니다. 다시 로그인해주세요.',
+<<<<<<< HEAD
       icon: path.join(__dirname, 'images', 'korea.png'),
+=======
+      icon: path.join(__dirname, 'korea.icns'),
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
       sound: true
     });
   }
@@ -518,6 +550,7 @@ function setupWebviewEventListeners() {
               if (webviewURL.includes('portal.korea.ac.kr')) {
                 console.log('고려대학교 포털 페이지 감지됨');
                 
+<<<<<<< HEAD
                 // 웹뷰에 preload 스크립트 설정 (절대 경로로 설정)
                 const preloadPath = path.resolve(__dirname, 'webview-preload.js');
                 console.log('웹뷰 preload 경로:', preloadPath);
@@ -811,6 +844,109 @@ function setupWebviewEventListeners() {
                     console.error('웹뷰 JavaScript 실행 오류:', error);
                   }
                 }, 3000); // 3초 후 실행
+=======
+                // Pretendard 폰트 적용 (webview에 직접 주입 - 더 강력한 방법)
+                setTimeout(() => {
+                  webview.executeJavaScript(\`
+                    (() => {
+                      try {
+                        console.log('Pretendard 폰트 주입 시작...');
+                        
+                        // 기존 폰트 스타일 제거
+                        const existingStyles = document.querySelectorAll('#pretendard-font-injection, #pretendard-force-style');
+                        existingStyles.forEach(style => style.remove());
+                        
+                        // 1. 기본 폰트 CSS 주입
+                        const style = document.createElement('style');
+                        style.id = 'pretendard-font-injection';
+                        style.textContent = \`
+                          @font-face {
+                            font-family: 'Pretendard';
+                            src: local('Pretendard'), local('Pretendard-Regular');
+                            font-weight: 400;
+                            font-style: normal;
+                            font-display: swap;
+                          }
+                          @font-face {
+                            font-family: 'Pretendard';
+                            src: local('Pretendard-Bold'), local('Pretendard Bold');
+                            font-weight: 700;
+                            font-style: normal;
+                            font-display: swap;
+                          }
+                        \`;
+                        document.head.appendChild(style);
+                        
+                        // 2. 강제 적용 스타일 (최고 우선순위)
+                        const forceStyle = document.createElement('style');
+                        forceStyle.id = 'pretendard-force-style';
+                        forceStyle.textContent = \`
+                          /* 모든 요소에 Pretendard 강제 적용 */
+                          * {
+                            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+                          }
+                          
+                          /* 특정 요소들 강제 적용 */
+                          body, html, h1, h2, h3, h4, h5, h6, p, span, div, a, button, input, textarea, select, label, li, td, th, strong, b, em, i, u, small, big, sub, sup {
+                            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+                          }
+                          
+                          /* 인라인 스타일 무시 */
+                          [style*="font-family"], [style*="fontFamily"] {
+                            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+                          }
+                          
+                          /* CSS 변수 재정의 */
+                          :root, html {
+                            --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+                          }
+                        \`;
+                        document.head.appendChild(forceStyle);
+                        
+                        // 3. 모든 기존 요소에 직접 스타일 적용
+                        const allElements = document.querySelectorAll('*');
+                        allElements.forEach(element => {
+                          element.style.setProperty('font-family', 'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', 'important');
+                        });
+                        
+                        // 4. MutationObserver로 동적 요소 처리
+                        const observer = new MutationObserver((mutations) => {
+                          mutations.forEach((mutation) => {
+                            if (mutation.type === 'childList') {
+                              mutation.addedNodes.forEach((node) => {
+                                if (node.nodeType === 1) {
+                                  if (node.tagName) {
+                                    node.style.setProperty('font-family', 'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', 'important');
+                                  }
+                                  const childElements = node.querySelectorAll ? node.querySelectorAll('*') : [];
+                                  childElements.forEach(element => {
+                                    element.style.setProperty('font-family', 'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', 'important');
+                                  });
+                                }
+                              });
+                            }
+                          });
+                        });
+                        
+                        observer.observe(document.body, { childList: true, subtree: true });
+                        
+                        // 5. 추가 강제 적용 (setTimeout으로 지연 실행)
+                        setTimeout(() => {
+                          const allElementsAgain = document.querySelectorAll('*');
+                          allElementsAgain.forEach(element => {
+                            element.style.setProperty('font-family', 'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', 'important');
+                          });
+                          console.log('Pretendard 폰트 강제 적용 완료 (지연 실행)');
+                        }, 500);
+                        
+                        console.log('Pretendard 폰트가 webview에 주입되었습니다.');
+                      } catch (error) {
+                        console.error('webview 폰트 주입 오류:', error);
+                      }
+                    })();
+                  \`);
+                }, 1000);
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
                 
                 // Login.kpd 페이지인지 확인
                 if (webviewURL.includes('Login.kpd')) {
@@ -820,6 +956,7 @@ function setupWebviewEventListeners() {
                   globalLoginSuccess = false; // 전역 상태 리셋 (로그아웃/세션 만료로 인한 재로그인 가능)
                   console.log('로그인 폼 재감지로 전역 상태 리셋, 자동 로그인 재시작');
                   
+<<<<<<< HEAD
                   // 자동 로그인 시도 함수 (개선된 버전)
                   const attemptLogin = (attemptNumber) => {
                     if (loginSuccess) {
@@ -849,6 +986,46 @@ function setupWebviewEventListeners() {
                   
                   // 8초 후 최종 시도
                   setTimeout(() => attemptLogin('세 번째'), 8000);
+=======
+                  // 즉시 자동 로그인 시도 (시간 단축)
+                  setTimeout(() => {
+                    if (!loginSuccess) {
+                      window.electronAPI.triggerAutoLogin().then(result => {
+                        if (result && result.success) {
+                          loginSuccess = true;
+                          globalLoginSuccess = true; // 전역 상태 업데이트
+                          console.log('자동 로그인 성공, 추가 시도 중단');
+                        }
+                      });
+                    }
+                  }, 500); // 1초에서 0.5초로 단축
+                  
+                  // 추가로 3초 후에도 한 번 더 시도
+                  setTimeout(() => {
+                    if (!loginSuccess) {
+                      window.electronAPI.triggerAutoLogin().then(result => {
+                        if (result && result.success) {
+                          loginSuccess = true;
+                          globalLoginSuccess = true; // 전역 상태 업데이트
+                          console.log('두 번째 자동 로그인 성공, 추가 시도 중단');
+                        }
+                      });
+                    }
+                  }, 3000);
+                  
+                  // 추가로 8초 후에도 한 번 더 시도
+                  setTimeout(() => {
+                    if (!loginSuccess) {
+                      window.electronAPI.triggerAutoLogin().then(result => {
+                        if (result && result.success) {
+                          loginSuccess = true;
+                          globalLoginSuccess = true; // 전역 상태 업데이트
+                          console.log('세 번째 자동 로그인 성공, 추가 시도 중단');
+                        }
+                      });
+                    }
+                  }, 8000);
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
                 } else if (webviewURL.includes('error') || webviewURL.includes('404')) {
                   // 에러 페이지 감지 시 메인 페이지로 리다이렉트
                   console.log('에러 페이지 감지됨, 메인 페이지로 리다이렉트');
@@ -1522,6 +1699,7 @@ ipcMain.handle('start-portal', () => {
   }
 });
 
+<<<<<<< HEAD
 // 로그인 설정 페이지 핸들러
 ipcMain.handle('open-login-setup', () => {
   try {
@@ -1532,6 +1710,8 @@ ipcMain.handle('open-login-setup', () => {
   }
 });
 
+=======
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
 // 앱 이벤트
 app.whenReady().then(createWindow);
 

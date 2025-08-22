@@ -8,6 +8,7 @@ class LoginSetup {
     init() {
         this.bindEvents();
         this.validateForm();
+<<<<<<< HEAD
         this.checkEnvironment();
     }
     
@@ -25,6 +26,8 @@ class LoginSetup {
         if (!isElectron && !hasElectronAPI) {
             console.warn('Electron 환경이 아닙니다. 웹 브라우저에서 실행 중일 수 있습니다.');
         }
+=======
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
     }
     
     bindEvents() {
@@ -132,15 +135,21 @@ class LoginSetup {
         this.setLoadingState(true);
         
         try {
+<<<<<<< HEAD
             // Electron API 확인
             if (window.electronAPI) {
                 console.log('Electron API 사용 가능, 설정 저장 시도...');
+=======
+            // Electron API를 통해 설정 저장
+            if (window.electronAPI) {
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
                 const success = await window.electronAPI.saveLoginConfig(config);
                 
                 if (success) {
                     // 성공 메시지 표시
                     this.showSuccessMessage();
                     
+<<<<<<< HEAD
                     // 잠시 후 메인 페이지로 이동
                     setTimeout(() => {
                         // 메인 페이지로 이동
@@ -149,12 +158,19 @@ class LoginSetup {
                         } else {
                             // API가 없으면 직접 이동
                             window.location.href = 'index.html';
+=======
+                    // 잠시 후 포털로 이동
+                    setTimeout(() => {
+                        if (window.electronAPI) {
+                            window.electronAPI.startPortal();
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
                         }
                     }, 1500);
                 } else {
                     this.showErrorMessage('설정 저장에 실패했습니다. 다시 시도해주세요.');
                 }
             } else {
+<<<<<<< HEAD
                 console.warn('Electron API가 없습니다. 로컬 스토리지에 저장합니다.');
                 // 로컬 스토리지에 저장 (웹 브라우저 환경 대응)
                 this.saveToLocalStorage(config);
@@ -163,6 +179,9 @@ class LoginSetup {
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 1500);
+=======
+                this.showErrorMessage('앱 환경을 확인할 수 없습니다.');
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
             }
         } catch (error) {
             console.error('설정 저장 오류:', error);
@@ -172,6 +191,7 @@ class LoginSetup {
         }
     }
     
+<<<<<<< HEAD
     saveToLocalStorage(config) {
         try {
             localStorage.setItem('kupid_login_config', JSON.stringify(config));
@@ -193,6 +213,8 @@ class LoginSetup {
         }
     }
     
+=======
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
     setLoadingState(loading) {
         const submitBtn = this.form.querySelector('button[type="submit"]');
         const container = document.querySelector('.setup-container');

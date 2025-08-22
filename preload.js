@@ -1,5 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+<<<<<<< HEAD
 // Pretendard 폰트 CSS 주입 함수 (개선된 버전)
 function injectPretendardFont() {
   try {
@@ -17,17 +18,40 @@ function injectPretendardFont() {
       @font-face {
         font-family: 'Pretendard';
         src: local('Pretendard'), local('Pretendard-Regular'), local('Pretendard Regular');
+=======
+// Pretendard 폰트 CSS 주입 함수
+function injectPretendardFont() {
+  try {
+    // 이미 주입된 스타일이 있는지 확인
+    const existingStyle = document.getElementById('pretendard-font-injection');
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+
+    // Pretendard 폰트 CSS 생성
+    const style = document.createElement('style');
+    style.id = 'pretendard-font-injection';
+    style.textContent = `
+      @font-face {
+        font-family: 'Pretendard';
+        src: url('file://${__dirname}/fonts/Pretendard-Regular.woff2') format('woff2');
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
         font-weight: 400;
         font-style: normal;
         font-display: swap;
       }
       @font-face {
         font-family: 'Pretendard';
+<<<<<<< HEAD
         src: local('Pretendard-Bold'), local('Pretendard Bold'), local('PretendardBold');
+=======
+        src: url('file://${__dirname}/fonts/Pretendard-Bold.woff2') format('woff2');
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
         font-weight: 700;
         font-style: normal;
         font-display: swap;
       }
+<<<<<<< HEAD
     `;
     document.head.appendChild(style);
     
@@ -105,6 +129,53 @@ function injectPretendardFont() {
       clearInterval(intervalId);
       console.log('Pretendard 폰트 주기적 적용 완료');
     }, 10000);
+=======
+      
+      /* 모든 요소에 Pretendard 폰트 적용 */
+      * {
+        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+      }
+      
+      /* 특정 요소들에 대한 추가 적용 */
+      body, html, h1, h2, h3, h4, h5, h6, p, span, div, a, button, input, textarea, select, label, li, td, th {
+        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+      }
+      
+      /* 클래스별 적용 */
+      .title, .header, .content, .text, .label, .button, .input, .form {
+        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+      }
+    `;
+    
+    document.head.appendChild(style);
+    
+    // 모든 기존 요소에 직접 스타일 적용
+    const allElements = document.querySelectorAll('*');
+    allElements.forEach(element => {
+      element.style.setProperty('font-family', 'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', 'important');
+    });
+    
+    // 동적으로 추가되는 요소들을 위한 MutationObserver 설정
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1) { // Element node
+              if (node.tagName) {
+                node.style.setProperty('font-family', 'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', 'important');
+              }
+              const childElements = node.querySelectorAll ? node.querySelectorAll('*') : [];
+              childElements.forEach(element => {
+                element.style.setProperty('font-family', 'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', 'important');
+              });
+            }
+          });
+        }
+      });
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
     
     console.log('Pretendard 폰트가 모든 페이지에 주입되었습니다.');
   } catch (error) {
@@ -127,7 +198,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   performAutoLogin: (credentials) => ipcRenderer.invoke('perform-auto-login', credentials),
   triggerAutoLogin: () => ipcRenderer.invoke('trigger-auto-login'),
   startPortal: () => ipcRenderer.invoke('start-portal'),
+<<<<<<< HEAD
   openLoginSetup: () => ipcRenderer.invoke('open-login-setup'),
+=======
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
   
   // Pretendard 폰트 주입
   injectPretendardFont: () => injectPretendardFont(),
@@ -139,6 +213,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // 사용자 활동 감지
   onUserActivity: (callback) => {
+<<<<<<< HEAD
     try {
       // 마우스 클릭, 키보드 입력, 스크롤 등의 사용자 활동 감지
       const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
@@ -153,6 +228,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     } catch (error) {
       console.error('사용자 활동 감지 설정 오류:', error);
     }
+=======
+    // 마우스 클릭, 키보드 입력, 스크롤 등의 사용자 활동 감지
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    
+    events.forEach(event => {
+      document.addEventListener(event, () => {
+        callback();
+      }, { passive: true });
+    });
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
   }
 });
 
@@ -168,8 +253,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // 사용자 활동 시 세션 타이머 재설정
+<<<<<<< HEAD
 if (window.electronAPI && window.electronAPI.onUserActivity) {
   window.electronAPI.onUserActivity(() => {
     ipcRenderer.invoke('reset-session-timer');
   });
 }
+=======
+window.electronAPI.onUserActivity(() => {
+  ipcRenderer.invoke('reset-session-timer');
+});
+>>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
