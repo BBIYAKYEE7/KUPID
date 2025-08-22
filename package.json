@@ -1,6 +1,6 @@
 {
   "name": "korea-university-portal",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "고려대학교 포털 데스크탑 앱",
   "main": "main.js",
   "scripts": {
@@ -19,7 +19,7 @@
     "portal",
     "desktop-app"
   ],
-  "author": "KUPID",
+  "author": "BBIYAKYEE7(김재윤)",
   "license": "MIT",
   "devDependencies": {
     "electron": "^28.0.0",
@@ -39,6 +39,7 @@
       "renderer.js",
       "preload.js",
       "webview-preload.js",
+      "auto-updater.js",
       "index.html",
       "styles.css",
       "login-setup.html",

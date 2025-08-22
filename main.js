@@ -5,12 +5,15 @@ const configManager = require('./config');
 const https = require('https');
 const fs = require('fs');
 const { exec } = require('child_process');
+const AutoUpdater = require('./auto-updater');
 
 let mainWindow;
 let sessionTimer;
 let sessionTimeout = 60 * 60 * 1000; // 60분 (밀리초)으로 연장
 let warningTime = 10 * 60 * 1000; // 10분 전 경고로 연장
 let globalLoginSuccess = false; // 전역 로그인 성공 상태
+let autoUpdaterInstance = null; // 자동 업데이트 인스턴스
+let autoUpdaterInitialized = false; // 자동 업데이트 초기화 상태
 
 // 로그인 설정 확인 및 페이지 로드 함수
 async function checkLoginConfigAndLoadPage() {
@@ -318,86 +321,49 @@ class GitHubUpdater {
   }
 }
 
-// 자동 업데이트 이벤트 핸들러
+// 자동 업데이트 설정
 function setupAutoUpdater() {
-  const updater = new GitHubUpdater();
+  // 이미 초기화된 경우 중복 실행 방지
+  if (autoUpdaterInitialized) {
+    console.log('자동 업데이트가 이미 초기화되어 있습니다.');
+    return;
+  }
   
-  // 업데이트 확인
-  updater.checkForUpdates().then(updateInfo => {
-    if (updateInfo) {
-      console.log('업데이트 발견:', updateInfo);
-      
-      // 사용자에게 업데이트 알림
-      dialog.showMessageBox(mainWindow, {
-        type: 'info',
-        title: '업데이트 발견',
-        message: '새로운 버전이 발견되었습니다.',
-        detail: `현재 버전: ${app.getVersion()}\n새 버전: ${updateInfo.version}\n\n업데이트를 다운로드하시겠습니까?`,
-        buttons: ['다운로드', '나중에'],
-        defaultId: 0,
-        cancelId: 1
-      }).then((result) => {
-        if (result.response === 0) {
-          // 사용자가 다운로드 선택
-          downloadAndInstallUpdate(updater, updateInfo);
-        }
-      });
-    } else {
-      console.log('업데이트가 없습니다.');
-    }
-  }).catch(error => {
-    console.error('업데이트 확인 중 오류:', error);
-  });
-}
-
-// 업데이트 다운로드 및 설치
-async function downloadAndInstallUpdate(updater, updateInfo) {
   try {
-    if (!updateInfo.downloadUrl) {
-      throw new Error('다운로드 URL을 찾을 수 없습니다.');
-    }
-
-    // 다운로드 진행률 표시
-    const progressCallback = (progress) => {
-      console.log('다운로드 진행률:', progress.percent + '%');
-      
-      // 진행률을 렌더러로 전송
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.webContents.send('update-download-progress', progress);
-      }
-    };
-
-    // 업데이트 다운로드
-    const filePath = await updater.downloadUpdate(updateInfo.downloadUrl, progressCallback);
+    autoUpdaterInstance = new AutoUpdater();
     
-    console.log('업데이트 다운로드 완료:', filePath);
+    // 자동 업데이트 확인 시작
+    autoUpdaterInstance.startAutoUpdateCheck();
     
-    // 사용자에게 설치 알림
-    dialog.showMessageBox(mainWindow, {
-      type: 'info',
-      title: '업데이트 준비 완료',
-      message: '업데이트가 다운로드되었습니다.',
-      detail: '업데이트를 설치하시겠습니까?',
-      buttons: ['지금 설치', '나중에'],
-      defaultId: 0,
-      cancelId: 1
-    }).then((result) => {
-      if (result.response === 0) {
-        // 사용자가 설치 선택
-        updater.installUpdate(filePath).then(() => {
-          console.log('업데이트 설치 시작');
-        }).catch(error => {
-          console.error('업데이트 설치 오류:', error);
-          dialog.showErrorBox('업데이트 설치 오류', 
-            `업데이트 설치 중 오류가 발생했습니다:\n${error.message}`);
-        });
-      }
+    // IPC 핸들러 등록 (한 번만 등록)
+    ipcMain.handle('check-for-updates', async () => {
+      return await autoUpdaterInstance.checkForUpdatesManually();
     });
     
+    ipcMain.handle('enable-update-check', () => {
+      autoUpdaterInstance.enableUpdateCheck();
+    });
+    
+    ipcMain.handle('disable-update-check', () => {
+      autoUpdaterInstance.disableUpdateCheck();
+    });
+    
+    ipcMain.handle('enable-auto-update', () => {
+      autoUpdaterInstance.enableAutoUpdate();
+    });
+    
+    ipcMain.handle('disable-auto-update', () => {
+      autoUpdaterInstance.disableAutoUpdate();
+    });
+    
+    ipcMain.handle('get-auto-update-status', () => {
+      return autoUpdaterInstance.isAutoUpdateEnabled();
+    });
+    
+    autoUpdaterInitialized = true;
+    console.log('자동 업데이트 시스템이 초기화되었습니다.');
   } catch (error) {
-    console.error('업데이트 다운로드 오류:', error);
-    dialog.showErrorBox('업데이트 오류', 
-      `업데이트 중 오류가 발생했습니다:\n${error.message}`);
+    console.error('자동 업데이트 초기화 중 오류:', error);
   }
 }
 
@@ -1201,45 +1167,7 @@ ipcMain.handle('reset-session-timer', () => {
   resetSessionTimer();
 });
 
-// GitHub API 기반 업데이트 IPC 핸들러
-ipcMain.handle('check-for-updates', async () => {
-  try {
-    const updater = new GitHubUpdater();
-    const result = await updater.checkForUpdates();
-    return { success: true, result };
-  } catch (error) {
-    console.error('업데이트 확인 오류:', error);
-    return { success: false, error: error.message };
-  }
-});
 
-ipcMain.handle('download-update', async (event, updateInfo) => {
-  try {
-    const updater = new GitHubUpdater();
-    const progressCallback = (progress) => {
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.webContents.send('update-download-progress', progress);
-      }
-    };
-    
-    const filePath = await updater.downloadUpdate(updateInfo.downloadUrl, progressCallback);
-    return { success: true, filePath };
-  } catch (error) {
-    console.error('업데이트 다운로드 오류:', error);
-    return { success: false, error: error.message };
-  }
-});
-
-ipcMain.handle('install-update', async (event, filePath) => {
-  try {
-    const updater = new GitHubUpdater();
-    await updater.installUpdate(filePath);
-    return { success: true };
-  } catch (error) {
-    console.error('업데이트 설치 오류:', error);
-    return { success: false, error: error.message };
-  }
-});
 
 ipcMain.handle('get-session-info', () => {
   return {

@@ -134,8 +134,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // 업데이트 관련 API
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
-  downloadUpdate: () => ipcRenderer.invoke('download-update'),
-  installUpdate: () => ipcRenderer.invoke('install-update'),
+  enableUpdateCheck: () => ipcRenderer.invoke('enable-update-check'),
+  disableUpdateCheck: () => ipcRenderer.invoke('disable-update-check'),
+  enableAutoUpdate: () => ipcRenderer.invoke('enable-auto-update'),
+  disableAutoUpdate: () => ipcRenderer.invoke('disable-auto-update'),
+  getAutoUpdateStatus: () => ipcRenderer.invoke('get-auto-update-status'),
   
   // 사용자 활동 감지
   onUserActivity: (callback) => {

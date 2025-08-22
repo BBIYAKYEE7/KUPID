@@ -315,7 +315,7 @@ class AutoLoginManager {
         }
     }
     
-    showLoginSettingsModal() {
+    async showLoginSettingsModal() {
         const modal = document.getElementById('login-settings-modal');
         if (modal) {
             modal.classList.remove('hidden');
@@ -326,11 +326,23 @@ class AutoLoginManager {
                 const passwordInput = document.getElementById('password');
                 const autoLoginCheckbox = document.getElementById('auto-login');
                 const rememberCredentialsCheckbox = document.getElementById('remember-credentials');
+                const autoUpdateCheckbox = document.getElementById('auto-update');
                 
                 if (usernameInput) usernameInput.value = this.config.username || '';
                 if (passwordInput) passwordInput.value = this.config.password || '';
                 if (autoLoginCheckbox) autoLoginCheckbox.checked = this.config.autoLogin || false;
                 if (rememberCredentialsCheckbox) rememberCredentialsCheckbox.checked = this.config.rememberCredentials || false;
+                
+                // 자동 업데이트 상태 로드
+                if (autoUpdateCheckbox && window.electronAPI) {
+                    try {
+                        const autoUpdateStatus = await window.electronAPI.getAutoUpdateStatus();
+                        autoUpdateCheckbox.checked = autoUpdateStatus;
+                    } catch (error) {
+                        console.error('자동 업데이트 상태 로드 오류:', error);
+                        autoUpdateCheckbox.checked = false;
+                    }
+                }
             }
         }
     }
@@ -347,6 +359,7 @@ class AutoLoginManager {
         const password = document.getElementById('password').value;
         const autoLogin = document.getElementById('auto-login').checked;
         const rememberCredentials = document.getElementById('remember-credentials').checked;
+        const autoUpdate = document.getElementById('auto-update').checked;
         
         if (!username || !password) {
             alert('아이디와 비밀번호를 모두 입력해주세요.');
@@ -365,7 +378,15 @@ class AutoLoginManager {
                 const success = await window.electronAPI.saveLoginConfig(config);
                 if (success) {
                     this.config = config;
-                    alert('로그인 설정이 저장되었습니다.');
+                    
+                    // 자동 업데이트 설정 저장
+                    if (autoUpdate) {
+                        await window.electronAPI.enableAutoUpdate();
+                    } else {
+                        await window.electronAPI.disableAutoUpdate();
+                    }
+                    
+                    alert('설정이 저장되었습니다.');
                     this.hideLoginSettingsModal();
                     
                     // 자동 로그인이 활성화되어 있으면 즉시 실행
@@ -461,74 +482,10 @@ class AutoLoginManager {
     async checkForUpdates() {
         if (window.electronAPI) {
             try {
-                const result = await window.electronAPI.checkForUpdates();
-                if (result && result.success && result.result) {
-                    console.log('업데이트 발견:', result.result);
-                    
-                    // 사용자에게 업데이트 알림
-                    const shouldDownload = confirm(
-                        `새로운 버전이 발견되었습니다!\n\n` +
-                        `현재 버전: ${result.result.version}\n` +
-                        `새 버전: ${result.result.version}\n\n` +
-                        `업데이트를 다운로드하시겠습니까?`
-                    );
-                    
-                    if (shouldDownload) {
-                        this.downloadUpdate(result.result);
-                    }
-                } else if (result && result.success && !result.result) {
-                    console.log('업데이트가 없습니다.');
-                    alert('이미 최신 버전입니다.');
-                } else {
-                    console.error('업데이트 확인 실패:', result ? result.error : '알 수 없는 오류');
-                    alert('업데이트 확인에 실패했습니다.');
-                }
+                console.log('업데이트 확인 시작...');
+                await window.electronAPI.checkForUpdates();
             } catch (error) {
                 console.error('업데이트 확인 중 오류:', error);
-                alert('업데이트 확인 중 오류가 발생했습니다.');
-            }
-        }
-    }
-    
-    async downloadUpdate(updateInfo) {
-        if (window.electronAPI) {
-            try {
-                const result = await window.electronAPI.downloadUpdate(updateInfo);
-                if (result && result.success) {
-                    console.log('업데이트 다운로드 완료:', result.filePath);
-                    
-                    const shouldInstall = confirm(
-                        '업데이트가 다운로드되었습니다.\n\n' +
-                        '지금 설치하시겠습니까?'
-                    );
-                    
-                    if (shouldInstall) {
-                        this.installUpdate(result.filePath);
-                    }
-                } else {
-                    console.error('업데이트 다운로드 실패:', result ? result.error : '알 수 없는 오류');
-                    alert('업데이트 다운로드에 실패했습니다.');
-                }
-            } catch (error) {
-                console.error('업데이트 다운로드 중 오류:', error);
-                alert('업데이트 다운로드 중 오류가 발생했습니다.');
-            }
-        }
-    }
-    
-    async installUpdate(filePath) {
-        if (window.electronAPI) {
-            try {
-                const result = await window.electronAPI.installUpdate(filePath);
-                if (result && result.success) {
-                    console.log('업데이트 설치 시작');
-                } else {
-                    console.error('업데이트 설치 실패:', result ? result.error : '알 수 없는 오류');
-                    alert('업데이트 설치에 실패했습니다.');
-                }
-            } catch (error) {
-                console.error('업데이트 설치 중 오류:', error);
-                alert('업데이트 설치 중 오류가 발생했습니다.');
             }
         }
     }
