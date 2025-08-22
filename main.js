@@ -12,37 +12,7 @@ let sessionTimeout = 60 * 60 * 1000; // 60분 (밀리초)으로 연장
 let warningTime = 10 * 60 * 1000; // 10분 전 경고로 연장
 let globalLoginSuccess = false; // 전역 로그인 성공 상태
 
-<<<<<<< HEAD
-// 로그인 설정 확인 및 페이지 로드 함수
-async function checkLoginConfigAndLoadPage() {
-  try {
-    const config = configManager.loadConfig();
-    console.log('로드된 설정:', config);
-    
-    // 로그인 설정이 완전한지 확인
-    const hasValidConfig = config && 
-                          config.username && 
-                          config.username.trim() !== '' && 
-                          config.password && 
-                          config.password.trim() !== '' &&
-                          config.autoLogin;
-    
-    if (hasValidConfig) {
-      console.log('유효한 로그인 설정이 있습니다. 메인 페이지로 이동합니다.');
-      mainWindow.loadFile('index.html');
-    } else {
-      console.log('로그인 설정이 없습니다. 로그인 설정 페이지로 이동합니다.');
-      mainWindow.loadFile('login-setup.html');
-    }
-  } catch (error) {
-    console.error('로그인 설정 확인 중 오류:', error);
-    // 오류 발생 시 로그인 설정 페이지로 이동
-    mainWindow.loadFile('login-setup.html');
-  }
-}
 
-=======
->>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
 
 
 function createWindow() {
@@ -54,30 +24,17 @@ function createWindow() {
       contextIsolation: true,
       enableRemoteModule: false,
       webSecurity: true,
-<<<<<<< HEAD
       preload: path.resolve(__dirname, 'preload.js'),
       webviewTag: true
     },
     icon: path.join(__dirname, 'images', 'korea.png'),
-=======
-      preload: path.join(__dirname, 'preload.js'),
-      webviewTag: true
-    },
-    icon: path.join(__dirname, 'korea.icns'),
->>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
     title: '고려대학교 포털',
     show: false
   });
 
-<<<<<<< HEAD
-  // 로그인 설정 확인 후 적절한 페이지 로드
-  console.log('로그인 설정 확인 중...');
-  checkLoginConfigAndLoadPage();
-=======
   // 항상 index.html로 시작 (로그인 설정은 모달로 처리)
   console.log('메인 페이지로 시작');
   mainWindow.loadFile('index.html');
->>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
 
   // 개발자 도구 (개발 모드에서만)
   if (process.argv.includes('--dev')) {
@@ -1699,7 +1656,6 @@ ipcMain.handle('start-portal', () => {
   }
 });
 
-<<<<<<< HEAD
 // 로그인 설정 페이지 핸들러
 ipcMain.handle('open-login-setup', () => {
   try {
@@ -1710,8 +1666,7 @@ ipcMain.handle('open-login-setup', () => {
   }
 });
 
-=======
->>>>>>> 8e93c851d65919acebde4a7b2bff5c0f63871997
+
 // 앱 이벤트
 app.whenReady().then(createWindow);
 
