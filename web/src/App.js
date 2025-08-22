@@ -89,7 +89,7 @@ function App() {
             </li>
             <li>
               <h3>크로스 플랫폼</h3>
-              <p>macOS, Windows, Linux에서 동일한 경험을 제공합니다.</p>
+              <p>macOS, Windows, Linux에서 동일한 경험을 제공할 예정입니다. 현재는 Windows 버전만 제공됩니다.</p>
             </li>
           </ul>
         </section>
@@ -137,11 +137,17 @@ function App() {
 
       <footer className="footer" role="contentinfo">
         <div className="container">
-          <div style={{display:'flex',alignItems:'center',gap:8}}>
-            <img src="/images/korea.png" alt="고려대학교 아이콘" width="24" height="24" />
-            <span>MIT © KUPID</span>
+          <div className="footer-inner">
+            <h3 className="footer-brand">BBIYAKYEE7</h3>
+            <p className="footer-sub">2025 © Copyright by BBIYAKYEE7, All rights reserved.</p>
+            <img className="footer-badge" src="/images/kuni120-2.png" alt="고려대 120주년 배지" />
+            <p className="footer-sub">Made and serviced with React.js</p>
+            <div className="footer-ctas">
+              <a className="btn-footer" href="mailto:bbiyakyee7@gmail.com" aria-label="Email">✉️ 이메일</a>
+              <a className="btn-footer" href="https://github.com/BBIYAKYEE7" target="_blank" rel="noopener noreferrer" aria-label="GitHub">🐙 GitHub</a>
+              <a className="btn-footer" href="https://instagram.com/bbiyakyee7" target="_blank" rel="noopener noreferrer" aria-label="Instagram">📷 Instagram</a>
+            </div>
           </div>
-          <a href="https://github.com/BBIYAKYEE7/KUPID" target="_blank" rel="noopener noreferrer">GitHub</a>
         </div>
       </footer>
     </div>
