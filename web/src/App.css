@@ -222,8 +222,16 @@ body {
 .card:hover { box-shadow: none; }
 .card.disabled { opacity: 0.55; cursor: not-allowed; pointer-events: none; }
 .card-body { padding: 18px; display: flex; align-items: baseline; justify-content: space-between; }
-.os { font-size: 18px; font-weight: 700; }
-.hint { color: var(--muted); font-size: 12px; }
+.os { 
+  font-size: 18px; 
+  font-weight: 700; 
+  font-family: 'Pretendard', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+.hint { 
+  color: var(--muted); 
+  font-size: 12px; 
+  font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
 
 /* 라이트 모드용 다운로드 카드 */
 [data-theme="light"] .card.glass {
