@@ -55,6 +55,51 @@ body {
   box-shadow: none;
 }
 
+/* Liquid Glass 효과 - 완전한 유리 효과 */
+.modal-content.glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+/* 모달 내 모든 요소에 Liquid Glass 효과 적용 */
+.modal-content.glass * {
+  background: transparent !important;
+  backdrop-filter: blur(10px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(180%) !important;
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  -webkit-text-stroke: 0 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+/* 선택 버튼만 테두리 유지 */
+.modal-asset-btn {
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme="light"] .modal-content.glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1)) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .modal-content.glass * {
+  background: transparent !important;
+  backdrop-filter: blur(10px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(180%) !important;
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  -webkit-text-stroke: 0 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
 .glass::before { display: none; }
 
 .glass::after { display: none; }
@@ -103,9 +148,52 @@ body {
 .btn-ghost { background: transparent; }
 
 .section { padding: 48px 0; }
-.section-alt { background: var(--panel); border-top: 0; border-bottom: 0; transition: none; }
+.section-alt { 
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-top: 0; 
+  border-bottom: 0; 
+  transition: none; 
+  position: relative;
+}
+
+/* 다운로드 섹션 특별 효과 */
+#download.section-alt {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)) !important;
+  backdrop-filter: blur(25px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05) !important;
+}
 .muted { color: var(--muted); }
 .tiny { color: var(--muted); font-size: 12px; }
+
+/* 라이트 모드용 다운로드 섹션 배경 */
+[data-theme="light"] .section-alt {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1)) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+}
+
+/* 라이트 모드용 다운로드 섹션 특별 효과 */
+[data-theme="light"] #download.section-alt {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
+  backdrop-filter: blur(25px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.02) !important;
+}
+
+/* 다운로드 섹션 텍스트 효과 제거 */
+#download h2,
+#download p {
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  -webkit-text-stroke: 0 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
 
 .features { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 20px; padding: 0; list-style: none; }
 .features li { background: var(--panel); border: 0; padding: 18px; border-radius: 12px; }
@@ -116,13 +204,39 @@ body {
 
 .download { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 18px; }
 .card { display: block; background: var(--panel); border: 0; border-radius: 14px; text-decoration: none; color: var(--text); }
-.card.glass { background: transparent; border: 0; box-shadow: none; }
+.card.glass { 
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.3s ease;
+}
 .card.glass::before, .card.glass::after { display: none; }
+.card.glass:hover { 
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px 0 rgba(0, 0, 0, 0.25) !important;
+  border-color: rgba(139, 0, 0, 0.3) !important;
+  background: linear-gradient(135deg, rgba(139, 0, 0, 0.1), rgba(139, 0, 0, 0.05)) !important;
+}
 .card:hover { box-shadow: none; }
 .card.disabled { opacity: 0.55; cursor: not-allowed; pointer-events: none; }
 .card-body { padding: 18px; display: flex; align-items: baseline; justify-content: space-between; }
 .os { font-size: 18px; font-weight: 700; }
 .hint { color: var(--muted); font-size: 12px; }
+
+/* 라이트 모드용 다운로드 카드 */
+[data-theme="light"] .card.glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1)) !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .card.glass:hover {
+  box-shadow: 0 8px 25px 0 rgba(0, 0, 0, 0.15) !important;
+  border-color: rgba(139, 0, 0, 0.3) !important;
+  background: linear-gradient(135deg, rgba(139, 0, 0, 0.1), rgba(139, 0, 0, 0.05)) !important;
+}
 
 .footer { border-top: 1px solid var(--border); padding: 18px 0; color: var(--muted); background: var(--panel); }
 .footer-inner.glass { padding: 16px; border-radius: 16px; background: transparent; border: 0; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
@@ -154,21 +268,66 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 20px;
+  animation: modalFadeIn 0.3s ease-out;
 }
 
-.modal-content {
+.modal-overlay.closing {
+  animation: modalFadeOut 0.3s ease-in;
+}
+
+.modal-content.glass {
   max-width: 500px;
   width: 100%;
   border-radius: 16px;
   overflow: hidden;
   animation: modalSlideIn 0.3s ease-out;
+  /* 글래스 효과를 애니메이션 중에도 유지 - 더 높은 우선순위로 설정 */
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03)) !important;
+  backdrop-filter: saturate(180%) blur(16px) !important;
+  -webkit-backdrop-filter: saturate(180%) blur(16px) !important;
+  /* 텍스트 렌더링 개선 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+[data-theme="light"] .modal-content.glass {
+  background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.6)) !important;
+}
+
+.modal-content.glass.closing {
+  animation: modalSlideOut 0.3s ease-in;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 라이트 모드용 모달 오버레이 */
+[data-theme="light"] .modal-overlay {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+@keyframes modalFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes modalSlideIn {
@@ -182,18 +341,49 @@ body {
   }
 }
 
+@keyframes modalSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: none !important;
+  /* Liquid Glass 효과 */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)) !important;
+  backdrop-filter: blur(15px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+}
+
+[data-theme="light"] .modal-header {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1)) !important;
+  border-bottom: none !important;
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 20px;
   font-weight: 600;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* 강제로 텍스트 효과 제거 */
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+[data-theme="light"] .modal-header h3 {
+  color: #111216 !important;
 }
 
 .modal-close {
@@ -218,12 +408,31 @@ body {
 }
 
 .modal-body {
-  padding: 24px;
+  padding: 24px 28px 28px;
+  /* Liquid Glass 효과 */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)) !important;
+  backdrop-filter: blur(15px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+}
+
+[data-theme="light"] .modal-body {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05)) !important;
 }
 
 .modal-body p {
   margin: 0 0 20px;
   color: var(--muted);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* 강제로 텍스트 효과 제거 */
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+[data-theme="light"] .modal-body p {
+  color: #5b5b66 !important;
 }
 
 .modal-assets {
@@ -236,33 +445,66 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
-  padding: 16px;
-  border: 1px solid var(--border);
+  gap: 6px;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   border-radius: 12px;
-  background: var(--panel);
+  background: transparent !important;
   color: var(--text);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   text-align: left;
   width: 100%;
+  /* Liquid Glass 효과 */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-theme="light"] .modal-asset-btn {
+  color: #111216 !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1)) !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
 }
 
 .modal-asset-btn:hover {
-  border-color: var(--brand);
-  background: rgba(139, 0, 0, 0.05);
-  transform: translateY(-1px);
+  border-color: rgba(139, 0, 0, 0.3) !important;
+  background: linear-gradient(135deg, rgba(139, 0, 0, 0.1), rgba(139, 0, 0, 0.05)) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px 0 rgba(0, 0, 0, 0.25) !important;
+  /* 호버 시에도 Liquid Glass 효과 유지 */
+  backdrop-filter: blur(15px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
 }
 
 .asset-name {
   font-size: 16px;
   font-weight: 600;
+  line-height: 1.2;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* 강제로 텍스트 효과 제거 */
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
 }
 
 .asset-filename {
   font-size: 12px;
   color: var(--muted);
   font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  line-height: 1.4;
+  word-break: break-all;
+  max-width: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* 강제로 텍스트 효과 제거 */
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
 }
 
 @media (max-width: 600px) {

@@ -83,6 +83,7 @@ function App() {
   const primaryText = os === 'mac' ? 'macOS용 다운로드' : os === 'windows' ? 'Windows용 다운로드' : os === 'linux' ? 'Linux용 다운로드' : '최신 버전 보기';
   const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
   const [showModal, setShowModal] = React.useState(false);
+  const [isClosing, setIsClosing] = React.useState(false);
   const [modalAssets, setModalAssets] = React.useState([]);
   const [modalPlatform, setModalPlatform] = React.useState('');
   
@@ -149,7 +150,11 @@ function App() {
   }
 
   function closeModal() {
-    setShowModal(false);
+    setIsClosing(true);
+    setTimeout(() => {
+      setShowModal(false);
+      setIsClosing(false);
+    }, 300); // 애니메이션 지속 시간과 동일하게 설정
   }
 
   async function handlePrimaryClick(e) {
@@ -276,8 +281,8 @@ function App() {
 
       {/* 아키텍처 선택 모달 */}
       {showModal && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content glass" onClick={(e) => e.stopPropagation()}>
+        <div className={`modal-overlay ${isClosing ? 'closing' : ''}`} onClick={closeModal}>
+          <div className={`modal-content glass ${isClosing ? 'closing' : ''}`} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>아키텍처 선택</h3>
               <button className="modal-close" onClick={closeModal} aria-label="닫기">×</button>
