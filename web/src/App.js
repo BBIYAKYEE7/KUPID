@@ -15,7 +15,7 @@ async function fetchLatestAssets(platform) {
     if (platform === 'windows') {
       // Windows 에셋들 찾기
       assets.forEach(asset => {
-        if (/setup|\.exe$/i.test(asset.name)) {
+        if (/windows|\.exe$/i.test(asset.name) && !/mac|linux/i.test(asset.name)) {
           if (/x64|amd64/i.test(asset.name)) {
             platformAssets.push({ name: 'Windows x64', url: asset.browser_download_url, filename: asset.name });
           } else if (/x86|i386/i.test(asset.name)) {
@@ -30,7 +30,7 @@ async function fetchLatestAssets(platform) {
     } else if (platform === 'mac') {
       // macOS 에셋들 찾기
       assets.forEach(asset => {
-        if (/\.dmg$|\.pkg$|mac|darwin/i.test(asset.name)) {
+        if (/mac|\.dmg$|\.pkg$/i.test(asset.name) && !/windows|linux/i.test(asset.name)) {
           if (/arm64|m1|m2|apple/i.test(asset.name)) {
             platformAssets.push({ name: 'macOS Apple Silicon', url: asset.browser_download_url, filename: asset.name });
           } else if (/intel|x86_64/i.test(asset.name)) {
@@ -43,7 +43,7 @@ async function fetchLatestAssets(platform) {
     } else if (platform === 'linux') {
       // Linux 에셋들 찾기
       assets.forEach(asset => {
-        if (/\.AppImage$|\.deb$|\.rpm$|linux/i.test(asset.name)) {
+        if (/linux|\.AppImage$|\.deb$|\.rpm$/i.test(asset.name) && !/windows|mac/i.test(asset.name)) {
           if (/x64|amd64/i.test(asset.name)) {
             platformAssets.push({ name: 'Linux x64', url: asset.browser_download_url, filename: asset.name });
           } else if (/x86|i386/i.test(asset.name)) {
