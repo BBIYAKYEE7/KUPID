@@ -12,7 +12,17 @@
     "build:mac": "electron-builder --mac",
     "build:win-portable": "electron-builder --win portable",
     "build:win-installer": "electron-builder --win nsis",
-    "publish": "electron-builder --mac --win --linux --publish=always"
+    "publish": "electron-builder --mac --win --linux --publish=always",
+    "build:win-x64": "electron-builder --win --x64",
+    "build:win-x86": "electron-builder --win --ia32",
+    "build:win-arm64": "electron-builder --win --arm64",
+    "build:mac-x64": "electron-builder --mac --x64",
+    "build:mac-arm64": "electron-builder --mac --arm64",
+    "build:mac-universal": "electron-builder --mac --universal",
+    "build:linux-x64": "electron-builder --linux --x64",
+    "build:linux-arm64": "electron-builder --linux --arm64",
+    "build:linux-armv7l": "electron-builder --linux --armv7l",
+    "build:all-arch": "npm run build:win-x64 && npm run build:win-arm64 && npm run build:mac-x64 && npm run build:mac-arm64 && npm run build:linux-x64 && npm run build:linux-arm64"
   },
   "keywords": [
     "electron",
@@ -20,7 +30,10 @@
     "portal",
     "desktop-app"
   ],
-  "author": "BBIYAKYEE7(김재윤)",
+  "author": {
+    "name": "BBIYAKYEE7(김재윤)",
+    "email": "bbiyakyee7@korea.ac.kr"
+  },
   "license": "MIT",
   "devDependencies": {
     "electron": "^25.9.8",
@@ -54,23 +67,36 @@
     ],
     "mac": {
       "category": "public.app-category.education",
-      "icon": "images/korea.png"
+      "icon": "images/korea.png",
+      "identity": null,
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64", "universal"]
+        }
+      ],
+      "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
     },
     "win": {
       "icon": "images/korea.png",
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
-        },
-        {
-          "target": "portable",
-          "arch": ["x64"]
+          "arch": ["x64", "ia32", "arm64"]
         }
-      ]
+      ],
+      "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
     },
     "linux": {
-      "icon": "images/korea.png"
+      "icon": "images/korea.png",
+      "maintainer": "BBIYAKYEE7 <bbiyakyee7@gmail.com>",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64", "arm64", "armv7l"]
+        }
+      ],
+      "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
     },
     "nsis": {
       "oneClick": false,

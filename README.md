@@ -24,15 +24,61 @@ npm start
 
 ### 배포용 빌드
 
+#### 기본 빌드
 ```bash
-# macOS용 빌드
+# 전체 플랫폼 빌드
 npm run build
 
-# Windows용 빌드
-npm run build:win
+# 특정 플랫폼 빌드
+npm run build:win    # Windows
+npm run build:mac    # macOS
+npm run build:linux  # Linux
+```
 
-# Linux용 빌드
-npm run build:linux
+#### 아키텍처별 빌드
+
+**Windows**
+```bash
+npm run build:win-x64      # Windows x64
+npm run build:win-x86      # Windows x86 (32bit)
+npm run build:win-arm64    # Windows ARM64
+```
+
+**macOS**
+```bash
+npm run build:mac-x64      # macOS Intel
+npm run build:mac-arm64    # macOS Apple Silicon
+npm run build:mac-universal # macOS Universal (Intel + Apple Silicon)
+```
+
+**Linux**
+```bash
+npm run build:linux-x64    # Linux x64
+npm run build:linux-arm64  # Linux ARM64
+npm run build:linux-armv7l # Linux ARMv7
+```
+
+**모든 아키텍처 빌드**
+```bash
+npm run build:all-arch     # 모든 주요 아키텍처 빌드
+```
+
+#### 스크립트를 사용한 빌드
+
+**macOS/Linux**
+```bash
+./build-arch.sh win x64      # Windows x64만 빌드
+./build-arch.sh mac arm64    # macOS Apple Silicon만 빌드
+./build-arch.sh linux all    # Linux 모든 아키텍처 빌드
+./build-arch.sh all all      # 모든 플랫폼 모든 아키텍처 빌드
+```
+
+**Windows**
+```cmd
+build-arch.bat win x64       # Windows x64만 빌드
+build-arch.bat mac arm64     # macOS Apple Silicon만 빌드
+build-arch.bat linux all     # Linux 모든 아키텍처 빌드
+build-arch.bat all all       # 모든 플랫폼 모든 아키텍처 빌드
 ```
 
 ## 🔄 자동 업데이트 시스템
@@ -95,9 +141,26 @@ KUPID/
 
 빌드가 완료되면 `dist` 폴더에 다음 파일들이 생성됩니다:
 
-- `고려대학교 포털 1.1.0.exe` - Windows 포터블 버전
-- `고려대학교 포털 Setup 1.1.0.exe` - Windows 설치 프로그램
-- `win-unpacked/` - 압축 해제된 앱 파일들
+### Windows
+- `고려대학교 포털-1.1.0-win-x64.exe` - Windows x64 포터블 버전
+- `고려대학교 포털-1.1.0-win-arm64.exe` - Windows ARM64 포터블 버전
+- `고려대학교 포털 Setup 1.1.0.exe` - Windows x64 설치 프로그램
+- `고려대학교 포털 Setup 1.1.0-arm64.exe` - Windows ARM64 설치 프로그램
+- `고려대학교 포털-1.1.0-win-x64.zip` - Windows x64 압축 파일
+- `고려대학교 포털-1.1.0-win-arm64.zip` - Windows ARM64 압축 파일
+
+### macOS
+- `고려대학교 포털-1.1.0-mac-x64.dmg` - macOS Intel DMG
+- `고려대학교 포털-1.1.0-mac-arm64.dmg` - macOS Apple Silicon DMG
+- `고려대학교 포털-1.1.0-mac-universal.dmg` - macOS Universal DMG
+- `고려대학교 포털-1.1.0-mac-x64.zip` - macOS Intel 압축 파일
+- `고려대학교 포털-1.1.0-mac-arm64.zip` - macOS Apple Silicon 압축 파일
+
+### Linux
+- `고려대학교 포털-1.1.0-linux-x64.AppImage` - Linux x64 AppImage
+- `고려대학교 포털-1.1.0-linux-arm64.AppImage` - Linux ARM64 AppImage
+- `고려대학교 포털-1.1.0-linux-x64.deb` - Linux x64 Debian 패키지
+- `고려대학교 포털-1.1.0-linux-arm64.deb` - Linux ARM64 Debian 패키지
 
 ## 🔧 개발 환경 설정
 

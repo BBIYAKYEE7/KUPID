@@ -3,25 +3,71 @@ import './App.css';
 
 const RELEASE_URL = 'https://github.com/BBIYAKYEE7/KUPID/releases/latest';
 
-async function fetchLatestAssetUrl(platform) {
+async function fetchLatestAssets(platform) {
   try {
     const res = await fetch('https://api.github.com/repos/BBIYAKYEE7/KUPID/releases/latest', { headers: { 'Accept': 'application/vnd.github+json' } });
     if (!res.ok) throw new Error('Failed to fetch releases');
     const data = await res.json();
     
-    let asset;
+    const assets = data.assets || [];
+    const platformAssets = [];
+    
     if (platform === 'windows') {
-      asset = (data.assets || []).find(a => /setup|\.exe$/i.test(a.name));
+      // Windows 에셋들 찾기
+      assets.forEach(asset => {
+        if (/setup|\.exe$/i.test(asset.name)) {
+          if (/x64|amd64/i.test(asset.name)) {
+            platformAssets.push({ name: 'Windows x64', url: asset.browser_download_url, filename: asset.name });
+          } else if (/x86|i386/i.test(asset.name)) {
+            platformAssets.push({ name: 'Windows x86', url: asset.browser_download_url, filename: asset.name });
+          } else if (/arm64/i.test(asset.name)) {
+            platformAssets.push({ name: 'Windows ARM64', url: asset.browser_download_url, filename: asset.name });
+          } else {
+            platformAssets.push({ name: 'Windows', url: asset.browser_download_url, filename: asset.name });
+          }
+        }
+      });
     } else if (platform === 'mac') {
-      asset = (data.assets || []).find(a => /\.dmg$|\.pkg$|mac|darwin/i.test(a.name));
+      // macOS 에셋들 찾기
+      assets.forEach(asset => {
+        if (/\.dmg$|\.pkg$|mac|darwin/i.test(asset.name)) {
+          if (/arm64|m1|m2|apple/i.test(asset.name)) {
+            platformAssets.push({ name: 'macOS Apple Silicon', url: asset.browser_download_url, filename: asset.name });
+          } else if (/intel|x86_64/i.test(asset.name)) {
+            platformAssets.push({ name: 'macOS Intel', url: asset.browser_download_url, filename: asset.name });
+          } else {
+            platformAssets.push({ name: 'macOS', url: asset.browser_download_url, filename: asset.name });
+          }
+        }
+      });
     } else if (platform === 'linux') {
-      asset = (data.assets || []).find(a => /\.AppImage$|\.deb$|\.rpm$|linux/i.test(a.name));
+      // Linux 에셋들 찾기
+      assets.forEach(asset => {
+        if (/\.AppImage$|\.deb$|\.rpm$|linux/i.test(asset.name)) {
+          if (/x64|amd64/i.test(asset.name)) {
+            platformAssets.push({ name: 'Linux x64', url: asset.browser_download_url, filename: asset.name });
+          } else if (/x86|i386/i.test(asset.name)) {
+            platformAssets.push({ name: 'Linux x86', url: asset.browser_download_url, filename: asset.name });
+          } else if (/arm64|aarch64/i.test(asset.name)) {
+            platformAssets.push({ name: 'Linux ARM64', url: asset.browser_download_url, filename: asset.name });
+          } else if (/arm|armv7/i.test(asset.name)) {
+            platformAssets.push({ name: 'Linux ARM', url: asset.browser_download_url, filename: asset.name });
+          } else {
+            platformAssets.push({ name: 'Linux', url: asset.browser_download_url, filename: asset.name });
+          }
+        }
+      });
     }
     
-    return asset ? asset.browser_download_url : RELEASE_URL;
+    return platformAssets.length > 0 ? platformAssets : [{ name: 'GitHub Releases', url: RELEASE_URL, filename: 'releases' }];
   } catch (e) {
-    return RELEASE_URL;
+    return [{ name: 'GitHub Releases', url: RELEASE_URL, filename: 'releases' }];
   }
+}
+
+async function fetchLatestAssetUrl(platform) {
+  const assets = await fetchLatestAssets(platform);
+  return assets[0]?.url || RELEASE_URL;
 }
 
 function detectOS() {
@@ -36,6 +82,9 @@ function App() {
   const os = detectOS();
   const primaryText = os === 'mac' ? 'macOS용 다운로드' : os === 'windows' ? 'Windows용 다운로드' : os === 'linux' ? 'Linux용 다운로드' : '최신 버전 보기';
   const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
+  const [showModal, setShowModal] = React.useState(false);
+  const [modalAssets, setModalAssets] = React.useState([]);
+  const [modalPlatform, setModalPlatform] = React.useState('');
   
   React.useEffect(() => {
     if (storedTheme) {
@@ -60,26 +109,59 @@ function App() {
   }
   async function handleWindowsClick(e) {
     e.preventDefault();
-    const url = await fetchLatestAssetUrl('windows');
-    window.location.href = url;
+    await showArchitectureSelector('windows');
   }
   
   async function handleMacClick(e) {
     e.preventDefault();
-    const url = await fetchLatestAssetUrl('mac');
-    window.location.href = url;
+    await showArchitectureSelector('mac');
   }
   
+  async function handleLinuxClick(e) {
+    e.preventDefault();
+    await showArchitectureSelector('linux');
+  }
+  
+  async function showArchitectureSelector(platform) {
+    const assets = await fetchLatestAssets(platform);
+    
+    if (assets.length === 1 && assets[0].filename === 'releases') {
+      // 에셋을 찾지 못한 경우 GitHub Releases로 이동
+      window.location.href = assets[0].url;
+      return;
+    }
+    
+    if (assets.length === 1) {
+      // 에셋이 하나만 있는 경우 바로 다운로드
+      window.location.href = assets[0].url;
+      return;
+    }
+    
+    // 여러 아키텍처가 있는 경우 모달 표시
+    setModalAssets(assets);
+    setModalPlatform(platform);
+    setShowModal(true);
+  }
+
+  function handleAssetSelect(url) {
+    window.location.href = url;
+    setShowModal(false);
+  }
+
+  function closeModal() {
+    setShowModal(false);
+  }
+
   async function handlePrimaryClick(e) {
     e.preventDefault();
     if (os === 'windows') {
-      const url = await fetchLatestAssetUrl('windows');
-      window.location.href = url;
+      await showArchitectureSelector('windows');
     } else if (os === 'mac') {
-      const url = await fetchLatestAssetUrl('mac');
-      window.location.href = url;
+      await showArchitectureSelector('mac');
+    } else if (os === 'linux') {
+      await showArchitectureSelector('linux');
     } else {
-      alert('준비중입니다. Windows와 macOS 버전은 바로 설치 가능합니다.');
+      alert('지원되지 않는 운영체제입니다. Windows, macOS, Linux 버전을 제공합니다.');
     }
   }
 
@@ -130,7 +212,7 @@ function App() {
             </li>
             <li className="glass">
               <h3>크로스 플랫폼</h3>
-              <p>macOS, Windows, Linux에서 동일한 경험을 제공할 예정입니다. 현재는 Windows와 macOS 버전을 제공합니다.</p>
+              <p>macOS, Windows, Linux에서 동일한 경험을 제공합니다. 모든 주요 운영체제를 지원합니다.</p>
             </li>
           </ul>
         </section>
@@ -138,24 +220,24 @@ function App() {
         <section id="download" className="section section-alt" aria-labelledby="download-title">
           <div className="container">
             <h2 id="download-title">다운로드</h2>
-            <p className="muted">아래에서 운영체제에 맞는 설치 파일을 선택하세요.</p>
+            <p className="muted">아래에서 운영체제에 맞는 설치 파일을 선택하세요. 아키텍처별로 다운로드할 수 있습니다.</p>
             <div className="download">
               <a className="card glass" href="#" onClick={handleMacClick} aria-label="macOS용 다운로드">
                 <div className="card-body">
-                  <span className="os">macOS(Apple Silicon)</span>
-                  <span className="hint">.dmg </span>
+                  <span className="os">macOS</span>
+                  <span className="hint">Apple Silicon / Intel</span>
                 </div>
               </a>
               <a className="card glass" href="#" onClick={handleWindowsClick} aria-label="Windows용 다운로드">
                 <div className="card-body">
-                  <span className="os">Windows(x64)</span>
-                  <span className="hint">Setup.exe</span>
+                  <span className="os">Windows</span>
+                  <span className="hint">x64 / x86 / ARM64</span>
                 </div>
               </a>
-              <a className="card glass disabled" href="#" aria-label="Linux 준비중">
+              <a className="card glass" href="#" onClick={handleLinuxClick} aria-label="Linux용 다운로드">
                 <div className="card-body">
                   <span className="os">Linux</span>
-                  <span className="hint">준비중</span>
+                  <span className="hint">x64 / x86 / ARM64 / ARM</span>
                 </div>
               </a>
             </div>
@@ -191,6 +273,33 @@ function App() {
           </div>
         </div>
       </footer>
+
+      {/* 아키텍처 선택 모달 */}
+      {showModal && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content glass" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>아키텍처 선택</h3>
+              <button className="modal-close" onClick={closeModal} aria-label="닫기">×</button>
+            </div>
+            <div className="modal-body">
+              <p>사용 가능한 {modalPlatform === 'windows' ? 'Windows' : modalPlatform === 'mac' ? 'macOS' : 'Linux'} 아키텍처를 선택하세요:</p>
+              <div className="modal-assets">
+                {modalAssets.map((asset, index) => (
+                  <button
+                    key={index}
+                    className="modal-asset-btn"
+                    onClick={() => handleAssetSelect(asset.url)}
+                  >
+                    <span className="asset-name">{asset.name}</span>
+                    <span className="asset-filename">{asset.filename}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
