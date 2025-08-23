@@ -40,6 +40,7 @@
     "electron-builder": "^24.6.4"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.5.0",
     "node-notifier": "^10.0.1"
   },
   "build": {
@@ -72,7 +73,11 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64", "universal"]
+          "arch": [
+            "x64",
+            "arm64",
+            "universal"
+          ]
         }
       ],
       "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
@@ -82,7 +87,11 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64", "ia32", "arm64"]
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
         }
       ],
       "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
@@ -93,7 +102,11 @@
       "target": [
         {
           "target": "AppImage",
-          "arch": ["x64", "arm64", "armv7l"]
+          "arch": [
+            "x64",
+            "arm64",
+            "armv7l"
+          ]
         }
       ],
       "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
@@ -104,7 +117,9 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "고려대학교 포털",
-      "installerLanguages": ["ko-KR"],
+      "installerLanguages": [
+        "ko-KR"
+      ],
       "language": "1042"
     }
   }
