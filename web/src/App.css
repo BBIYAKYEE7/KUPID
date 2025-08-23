@@ -62,10 +62,11 @@ body {
 .container { width: min(1120px, 92%); margin: 0 auto; }
 
 .header {
-  position: sticky; top: 0; z-index: 10;
+  position: relative; top: 0; z-index: 10;
   background: rgba(11,11,12,0.75);
   backdrop-filter: saturate(180%) blur(12px);
   border-bottom: 0;
+  min-height: 60px;
 }
 .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; position: relative; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
@@ -73,145 +74,6 @@ body {
 .brand-logo-wide { transform: scaleX(1.1); transform-origin: left center; }
 .nav a { color: var(--muted); text-decoration: none; margin-left: 20px; font-weight: 500; }
 .nav a:hover { color: var(--text); }
-
-/* 햄버거 메뉴 버튼 (모바일에서만 표시) */
-.mobile-menu-toggle {
-  display: none;
-  flex-direction: column;
-  justify-content: space-around;
-  width: 30px;
-  height: 30px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  z-index: 20;
-}
-
-.hamburger-line {
-  width: 100%;
-  height: 3px;
-  background: var(--text);
-  border-radius: 2px;
-  transition: all 0.3s ease;
-}
-
-/* 모바일 메뉴 (기본적으로 숨김) */
-.mobile-nav {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: var(--bg);
-  backdrop-filter: saturate(180%) blur(16px);
-  border-top: 1px solid var(--border);
-  padding: 20px;
-  flex-direction: column;
-  gap: 15px;
-  z-index: 15;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  transform: translateY(-100%);
-  opacity: 0;
-  transition: all 0.3s ease;
-}
-
-  .mobile-nav a {
-    margin-left: 0 !important;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 16px;
-    transform: translateX(-20px);
-    opacity: 0;
-    transition: all 0.3s ease;
-    transition-delay: 0.1s;
-  }
-  
-  .mobile-nav a:nth-child(2) { transition-delay: 0.15s; }
-  .mobile-nav a:nth-child(3) { transition-delay: 0.2s; }
-  .mobile-nav a:nth-child(4) { transition-delay: 0.25s; }
-  .mobile-nav a:nth-child(5) { transition-delay: 0.3s; }
-
-.mobile-nav a:last-child {
-  border-bottom: none;
-}
-
-/* 모바일 메뉴 열림 상태 */
-.mobile-nav--open {
-  display: flex;
-  transform: translateY(0);
-  opacity: 1;
-}
-
-/* 모바일에서 데스크탑 네비게이션 숨김 */
-@media (max-width: 768px) {
-  .desktop-nav {
-    display: none;
-  }
-  
-  .mobile-menu-toggle {
-    display: flex;
-  }
-  
-  /* 햄버거 메뉴 애니메이션 */
-  .mobile-menu-toggle[aria-expanded="true"] .hamburger-line:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-  }
-  
-  .mobile-menu-toggle[aria-expanded="true"] .hamburger-line:nth-child(2) {
-    opacity: 0;
-  }
-  
-  .mobile-menu-toggle[aria-expanded="true"] .hamburger-line:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -6px);
-  }
-  
-  /* 모바일 메뉴가 열렸을 때 배경 스크롤 방지 */
-  .mobile-nav--open {
-    display: flex !important;
-  }
-  
-  /* 메뉴가 열렸을 때 항목들 애니메이션 */
-  .mobile-nav--open a {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  
-  /* 헤더 높이 조정 */
-  .header {
-    min-height: 60px;
-  }
-  
-  /* 모바일 메뉴 스타일 강화 */
-  .mobile-nav {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-top: none;
-    border-radius: 0 0 12px 12px;
-  }
-  
-  .mobile-nav a {
-    color: var(--text) !important;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
-  }
-  
-  .mobile-nav a:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text) !important;
-  }
-  
-  /* 모바일 메뉴 오버레이 */
-  .mobile-menu-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-  }
-}
 
 .main { padding: 64px 0 36px; }
 .hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px; align-items: center; }

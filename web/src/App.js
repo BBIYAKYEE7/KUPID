@@ -36,7 +36,6 @@ function App() {
   const os = detectOS();
   const primaryText = os === 'mac' ? 'macOS용 다운로드' : os === 'windows' ? 'Windows용 다운로드' : os === 'linux' ? 'Linux용 다운로드' : '최신 버전 보기';
   const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   
   React.useEffect(() => {
     if (storedTheme) {
@@ -92,59 +91,8 @@ function App() {
             <img className="brand-logo-wide" src="/images/kulogo(r).png" alt="고려대로고" width="125" height="36"/>
           </a>
           
-          {/* 햄버거 메뉴 버튼 (모바일) */}
-          <button 
-            className="mobile-menu-toggle" 
-            onClick={() => {
-              setIsMenuOpen(!isMenuOpen);
-              // 메뉴가 닫힐 때 애니메이션을 위해 약간의 지연
-              if (isMenuOpen) {
-                setTimeout(() => {
-                  // 애니메이션 완료 후 상태 정리
-                }, 300);
-              }
-            }}
-            aria-label="메뉴 열기"
-            aria-expanded={isMenuOpen}
-          >
-            <span className="hamburger-line"></span>
-            <span className="hamburger-line"></span>
-            <span className="hamburger-line"></span>
-          </button>
-          
-          {/* 데스크탑 네비게이션 */}
-          <nav className="nav desktop-nav" aria-label="주요">
-            <a href="#features">기능</a>
-            <a href="#download">다운로드</a>
-            <a href="#faq">FAQ</a>
-            <a href="https://github.com/BBIYAKYEE7/KUPID" target="_blank" rel="noopener noreferrer">GitHub</a>
-            <a className="btn" style={{marginLeft:12}} href="#" onClick={(e)=>{e.preventDefault();toggleTheme();}} aria-label="테마 전환">테마 전환</a>
-          </nav>
-          
-          {/* 모바일 메뉴 */}
-          <nav className={`nav mobile-nav ${isMenuOpen ? 'mobile-nav--open' : ''}`} aria-label="주요">
-            <a href="#features" onClick={() => {
-              setTimeout(() => setIsMenuOpen(false), 100);
-            }}>기능</a>
-            <a href="#download" onClick={() => {
-              setTimeout(() => setIsMenuOpen(false), 100);
-            }}>다운로드</a>
-            <a href="#faq" onClick={() => {
-              setTimeout(() => setIsMenuOpen(false), 100);
-            }}>FAQ</a>
-            <a href="https://github.com/BBIYAKYEE7/KUPID" target="_blank" rel="noopener noreferrer" onClick={() => {
-              setTimeout(() => setIsMenuOpen(false), 100);
-            }}>GitHub</a>
-            <a className="btn" href="#" onClick={(e)=>{e.preventDefault();toggleTheme();setTimeout(() => setIsMenuOpen(false), 100);}} aria-label="테마 전환">테마 전환</a>
-          </nav>
-          
-          {/* 모바일 메뉴 오버레이 (메뉴 외부 클릭 시 닫기) */}
-          {isMenuOpen && (
-            <div 
-              className="mobile-menu-overlay" 
-              onClick={() => setIsMenuOpen(false)}
-            />
-          )}
+          {/* 테마변경 버튼 */}
+          <a className="btn" href="#" onClick={(e)=>{e.preventDefault();toggleTheme();}} aria-label="테마 전환">테마 전환</a>
         </div>
       </header>
 
